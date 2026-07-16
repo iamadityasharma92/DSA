@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Arrays & Hashing |
 | Difficulty | Medium |
-| Primary Pattern | Merge Sort |
-| Secondary Pattern | Divide and Conquer |
+| Primary Pattern | In-place comparison sort |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,47 @@
 
 ## Problem Summary
 
-Interview problem `sort-an-array`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Sort an array of integers in ascending order. Return the sorted array. Must be better than O(n²) average.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ nums.length ≤ 5 × 10⁴`
+- `-5 × 10⁴ ≤ nums[i] ≤ 5 × 10⁴`
+- O(n log n) or better required
+
+---
+
+## Brute Force
+
+Selection sort or bubble sort → O(n²). Exceeds time limit.
 
 ---
 
 ## Core Observation
 
-Comparison sort requirement—standard divide conquer merge pattern.
+`submission-0` uses `Arrays.sort(nums)` — O(n log n) via Java's dual-pivot quicksort for primitives. For interviews, you should know how to implement merge sort or quicksort.
 
 ---
 
 ## Thinking Process
 
-1. mergesort(nums,l,r)
-2. mid split recurse
-3. merge two sorted halves
-4. Return sorted array
+**Merge Sort (canonical interview answer):**
+1. `mergeSort(nums, 0, n-1)`.
+2. Base: `l >= r` → return.
+3. `mid = (l+r)/2`. Recurse on both halves.
+4. Merge: merge sorted halves back into `nums[l..r]`.
 
-**Best understanding:** Merge sort or quicksort O(n log n)—divide halves merge sorted
+**Quick Sort (in-place, O(log n) space):**
+1. Pick pivot, partition (elements < pivot left, > pivot right).
+2. Recurse on both sides.
 
 ---
 
 ## Why the Approach Works
 
-Merge sort guaranteed O(n log n) stable divide structure.
+Merge sort: divide and conquer — merging two sorted arrays is O(n). T(n) = 2T(n/2) + O(n) → O(n log n) by Master Theorem.
 
 ---
 
@@ -44,71 +61,74 @@ Merge sort guaranteed O(n log n) stable divide structure.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Merge Sort |
-| Secondary | Divide and Conquer |
+| Primary | Divide and conquer sorting |
+| Interview | Implement merge sort; `Arrays.sort` won't suffice as the answer |
 
 ### Pattern Recognition Clues
 
-- Sort integers O(n log n)
-- Not counting sort range
-
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+- "Sort array O(n log n)"
+- Foundation for many problems that pre-sort input
 
 ---
 
 ## Alternative Approaches
 
-Heap sort in-place O(1) extra.
+**Counting sort:** O(n + range) for bounded integer ranges — useful if `|nums[i]| ≤ 50000`.
+
+**Heap sort:** O(n log n), O(1) space, but poor cache performance.
 
 ---
 
 ## Critical Implementation Details
 
-- Temp buffer on merge
-- Base l>=r return
+- `Arrays.sort` for `int[]` uses dual-pivot quicksort (O(n log n) average, O(n²) worst)
+- For interview: merge sort preferred (guaranteed O(n log n), stable)
+- `submission-0` is the minimal solution — fine for problem acceptance, not for interview
 
 ---
 
 ## Edge Cases
 
-- Already sorted
-- Duplicates
+- Already sorted → best case for insertion sort, average for quicksort
+- All same values → sorted trivially
+- Single element
 
 ---
 
 ## Common Mistakes
 
-- O(n²) bubble on large n
-- Merge index bugs
+- Using `Arrays.sort` on a `List` of `Integer` (boxing overhead) instead of primitive `int[]`
+- Quick sort: random pivot needed to avoid O(n²) worst case on sorted input
 
 ---
 
 ## Complexity
 
-| | |
-|--|--|
-| Time | O(n log n) |
-| Space | O(n) merge sort |
+| | Merge Sort | Quick Sort |
+|--|--|--|
+| Time | O(n log n) always | O(n log n) avg, O(n²) worst |
+| Space | O(n) | O(log n) avg |
 
 ---
 
 ## Similar Problems
 
-- [sort-colors](../sort-colors/README.md)
-- [merge-sorted-array](../merge-sorted-array/README.md)
+- [top-k-elements-in-list](../top-k-elements-in-list/README.md) — uses sorting as a step
+- [sort-colors](../sort-colors/README.md) — O(n) sort for 3-element alphabet
 
 ---
 
 ## One-line Takeaway
 
-**General sort → merge/quick O(n log n) divide conquer.**
+**`Arrays.sort` for acceptance; know merge sort for interviews: divide, recurse, merge.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] split recurse
-- [ ] merge halves
+- [ ] Merge sort recurrence?
+- [ ] Why merge sort preferred over quicksort in interviews (guaranteed O(n log n))?
+- [ ] When is counting sort better?
 
 ---
 
@@ -116,4 +136,4 @@ Heap sort in-place O(1) extra.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | `submission-0` uses `Arrays.sort`; implement merge sort for interview |

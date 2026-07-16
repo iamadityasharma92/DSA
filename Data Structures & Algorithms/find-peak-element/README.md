@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Binary Search |
 | Difficulty | Medium |
-| Primary Pattern | Binary Search |
-| Secondary Pattern | Greedy Direction |
+| Primary Pattern | Binary Search (move toward larger neighbor) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `find-peak-element`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Find **any** peak element in an array (a peak is strictly greater than its neighbors). Elements outside the array are considered `-∞`. Must run in O(log n).
+
+---
+
+## Constraints (typical)
+
+- `nums[-1] = nums[n] = -∞` conceptually
+- Multiple peaks may exist; return any
+- Must be O(log n)
+
+---
+
+## Brute Force
+
+`submission-0`: linear scan checking both neighbors → O(n). Correct but doesn't meet O(log n).
 
 ---
 
 ## Core Observation
 
-Climb toward larger neighbor—guaranteed peak exists by boundary -∞.
+From any element, if the right neighbor is larger, move right — there must be a peak to the right (since the boundary is `-∞`). If the left neighbor is larger, move left. If neither, current element is a peak. This is a gradient ascent that binary search can exploit.
 
 ---
 
 ## Thinking Process
 
-1. l=0,r=n-1
-2. If nums[mid]<nums[mid+1] l=mid+1
-3. Else r=mid
-4. Return l
-
-**Best understanding:** BS: if nums[mid]<nums[mid+1] peak in right else peak in left incl mid
+1. `l = 0`, `r = n` (half-open).
+2. While `l <= r`: `m = l + (r-l)/2`.
+3. If `m > 0 && nums[m-1] > nums[m]` → peak is left: `r = m - 1`.
+4. Else if `m < n-1 && nums[m] < nums[m+1]` → peak is right: `l = m + 1`.
+5. Else → `nums[m]` is a peak: return `m`.
 
 ---
 
 ## Why the Approach Works
 
-Ascending slope to the right means a peak exists on right side.
+The guaranteed boundary condition (`-∞` at edges) means: if `nums[m] < nums[m+1]`, there must be a peak somewhere to the right of `m` (values can't increase forever with a `-∞` boundary). Binary search exploits this monotone guarantee.
 
 ---
 
@@ -44,42 +57,44 @@ Ascending slope to the right means a peak exists on right side.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Binary Search |
-| Secondary | Greedy Direction |
+| Primary | Binary Search by gradient: move toward larger neighbor |
+| Contrast | Classic BS has a target; this follows local gradient |
 
 ### Pattern Recognition Clues
 
-- Any peak index
-- nums[i] != nums[i+1]
+- "Find a peak (any), O(log n)"
+- Boundary values are `-∞`
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Binary Search](../Binary%20Search/README.md) · [PATTERNS.md](../../PATTERNS.md#binary-search-templates)
 
 ---
 
 ## Alternative Approaches
 
-Linear scan O(n).
+Linear scan — O(n), fails the time constraint. Binary search on gradient is the required approach.
 
 ---
 
 ## Critical Implementation Details
 
-- mid+1 must exist—r starts n-1
-- Any peak acceptable
+- Guard `m > 0` before accessing `nums[m-1]`; guard `m < n-1` before `nums[m+1]`
+- Check left neighbor first — if ascending from the left, moving right is safe
+- `submission-3` half-open style with `r = n` needs care: `while(l <= r)` with `r = m-1` covers all cases
 
 ---
 
 ## Edge Cases
 
-- Single element
-- Strictly increasing—last peak
+- Single element (always a peak)
+- Strictly increasing array (peak is last element)
+- Strictly decreasing array (peak is first element)
 
 ---
 
 ## Common Mistakes
 
-- Requiring global maximum
-- mid-1 compare off bounds
+- Accessing `nums[m-1]` without checking `m > 0` (ArrayIndexOutOfBoundsException)
+- Using `>=` in neighbor comparisons (equal neighbors are not strictly greater)
 
 ---
 
@@ -94,21 +109,22 @@ Linear scan O(n).
 
 ## Similar Problems
 
-- [find-in-mountain-array](../find-in-mountain-array/README.md)
-- [find-minimum-in-rotated-sorted-array](../find-minimum-in-rotated-sorted-array/README.md)
+- [find-in-mountain-array](../find-in-mountain-array/README.md) — uses peak finding as step 1
+- [find-minimum-in-rotated-sorted-array](../find-minimum-in-rotated-sorted-array/README.md) — also reasons about which half to search
 
 ---
 
 ## One-line Takeaway
 
-**Find any peak → BS toward larger adjacent neighbor.**
+**Move toward the larger neighbor — peaks exist at both ends, so you always converge.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Compare mid vs mid+1
-- [ ] Return l
+- [ ] Why are boundary conditions `-∞` useful here?
+- [ ] Guard conditions before neighbor access?
+- [ ] When can you immediately return `m` as a peak?
 
 ---
 
@@ -116,4 +132,4 @@ Linear scan O(n).
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-3 |
+| — | `submission-0` (linear) → `submission-3` (binary search, optimal) |

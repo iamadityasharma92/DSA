@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Arrays & Hashing |
 | Difficulty | Medium |
-| Primary Pattern | Array Reversal |
-| Secondary Pattern | Math |
+| Primary Pattern | Triple Reverse |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,47 @@
 
 ## Problem Summary
 
-Interview problem `rotate-array`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an integer array `nums`, rotate it to the right by `k` steps in-place.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ nums.length ≤ 10⁵`
+- `0 ≤ k ≤ 10⁵`
+- In-place, O(1) extra space
+
+---
+
+## Brute Force
+
+Rotate one position at a time → O(n × k). Too slow.
 
 ---
 
 ## Core Observation
 
-Three reversals cyclically shift array right by k in O(n) O(1) space.
+Rotating right by `k` is equivalent to three in-place reverses:
+1. Reverse the entire array.
+2. Reverse first `k` elements.
+3. Reverse last `n-k` elements.
 
 ---
 
 ## Thinking Process
 
-1. k%=n
-2. reverse(0,n-1)
-3. reverse(0,k-1)
-4. reverse(k,n-1)
+1. `k = k % n` (handle `k ≥ n`).
+2. `reverse(nums, 0, n-1)` — reverse all.
+3. `reverse(nums, 0, k-1)` — reverse first `k` (now at front).
+4. `reverse(nums, k, n-1)` — reverse last `n-k`.
 
-**Best understanding:** Reverse whole, reverse first k, reverse rest; k%=n
+`submission-2` implements this with a helper `reverse(int[], l, r)`.
 
 ---
 
 ## Why the Approach Works
 
-Reversal algebra moves tail k elems to front without extra buffer.
+After the full reverse, the last `k` elements (which should be in front after rotation) are at the front — but in reversed order within that group. Reversing each group again produces the correct order.
 
 ---
 
@@ -44,42 +61,46 @@ Reversal algebra moves tail k elems to front without extra buffer.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Array Reversal |
-| Secondary | Math |
+| Primary | Triple reverse for cyclic rotation |
+| Foundation | reverse-string as the primitive operation |
 
 ### Pattern Recognition Clues
 
-- Rotate right k steps
-- O(1) space
+- "Rotate array in-place O(1) space"
+- Think: what does rotating look like in reverse?
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Arrays & Hashing](../Arrays%20%26%20Hashing/README.md)
 
 ---
 
 ## Alternative Approaches
 
-GCD cyclic swaps or temp array O(n) space.
+**Extra array:** copy to `new_nums[(i + k) % n]` — O(n) space, O(n) time. Simple but violates O(1) space.
+
+**Cyclic replacement:** follow the chain of element swaps → O(n) time, O(1) space. Complex to implement correctly.
 
 ---
 
 ## Critical Implementation Details
 
-- k mod n early
-- Reverse index ranges correct
+- `k = k % n` first — `k ≥ n` would cause out-of-bounds in `reverse(0, k-1)` if not reduced
+- `n == 1` early return (though `k % n = 0` makes all reverses no-ops anyway)
+- `reverse(0, k-1)` requires `k ≥ 1` after modulo (if `k = 0`, reverse on empty range is safe)
 
 ---
 
 ## Edge Cases
 
-- k=0 noop
-- k=n noop
+- `k = 0` → no rotation
+- `k = n` → same as original (`k % n = 0`)
+- `n = 1` → always unchanged
 
 ---
 
 ## Common Mistakes
 
-- Forgetting k%=n
-- Wrong subarray reverse bounds
+- Forgetting `k = k % n` before reversing (wrong bounds for `reverse`)
+- Wrong index ranges: first group `[0, k-1]`, second `[k, n-1]` (not `[k+1, n-1]`)
 
 ---
 
@@ -87,28 +108,28 @@ GCD cyclic swaps or temp array O(n) space.
 
 | | |
 |--|--|
-| Time | O(n) |
+| Time | O(n) — three full-length passes |
 | Space | O(1) |
 
 ---
 
 ## Similar Problems
 
-- [merge-sorted-array](../merge-sorted-array/README.md)
-- [concatenation-of-array](../concatenation-of-array/README.md)
+- [reverse-string](../reverse-string/README.md) — the primitive reverse operation used here
 
 ---
 
 ## One-line Takeaway
 
-**Rotate right k → triple reverse trick.**
+**Rotate by k = reverse all → reverse [0,k-1] → reverse [k,n-1]; always `k = k%n` first.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] k%=n
-- [ ] three reverses
+- [ ] Three reverse steps in order?
+- [ ] `k = k % n` before reversal?
+- [ ] Index ranges: `[0, k-1]` and `[k, n-1]`?
 
 ---
 
@@ -116,4 +137,4 @@ GCD cyclic swaps or temp array O(n) space.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | Documented from `submission-2.java` |

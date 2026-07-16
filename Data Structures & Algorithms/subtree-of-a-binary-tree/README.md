@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Trees |
 | Difficulty | Easy |
-| Primary Pattern | DFS |
-| Secondary Pattern | Tree Matching |
+| Primary Pattern | DFS with `isSameTree` subroutine |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,42 @@
 
 ## Problem Summary
 
-Interview problem `subtree-of-a-binary-tree`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given roots of two trees `root` and `subRoot`, return `true` if `subRoot` is a subtree of `root` — i.e., some node in `root`'s tree has a subtree identical to `subRoot`.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ root.length ≤ 2000`
+- `1 ≤ subRoot.length ≤ 1000`
+
+---
+
+## Brute Force
+
+For each node in `root`, check `isSameTree(node, subRoot)` → O(m × n). This IS the approach — it's the intended solution.
 
 ---
 
 ## Core Observation
 
-Subtree match requires identical structure at some node covering all sub nodes.
+Decompose into two problems:
+1. `isSameTree(p, q)` — are two trees identical?
+2. `isSubtree(root, subRoot)` — recursively check each node of `root`
 
 ---
 
 ## Thinking Process
 
-1. If root null false
-2. If sameTree(root,subRoot) true
-3. Search left or right subtree
-4. Combine with OR
-
-**Best understanding:** DFS root; at each node if sameTree(node, subRoot) return true
+1. Base: `root == null` → `false` (no node left to check).
+2. If `isSameTree(root, subRoot)` → `true` (found a match at current node).
+3. Else recurse: `isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot)`.
 
 ---
 
 ## Why the Approach Works
 
-Every node is candidate root for subtree equality check.
+Every node is a potential root of a matching subtree. The recursive DFS visits all nodes. `isSameTree` runs on each candidate node — O(n) per call × O(m) nodes = O(m × n) total.
 
 ---
 
@@ -44,42 +56,45 @@ Every node is candidate root for subtree equality check.
 
 | Role | Pattern |
 |------|---------|
-| Primary | DFS |
-| Secondary | Tree Matching |
+| Primary | DFS + same-tree subroutine |
+| Optimization | String serialization + KMP/rolling hash → O(m + n) |
 
 ### Pattern Recognition Clues
 
-- Contains subtree copy
-- Not merely same values
+- "Is subRoot somewhere in root's tree?"
+- Reuse `isSameTree` as a building block
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Trees](../Trees/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Serialize and substring—possible but heavier.
+**Serialization:** serialize both trees (pre-order with null markers) → check if `subSerial` is a substring of `rootSerial` using KMP → O(m + n). More complex.
 
 ---
 
 ## Critical Implementation Details
 
-- sameTree handles null symmetry
-- Subtree must include all descendants
+- `root == null` check before `isSameTree` prevents NPE
+- `||` short-circuits: if left subtree match found, don't check right
+- `isSameTree` must handle null-null (true), one-null (false), and value mismatch (false)
 
 ---
 
 ## Edge Cases
 
-- subRoot null true
-- Single node match
+- `subRoot` is a single leaf
+- `subRoot` is the entire root
+- `root` has duplicate subtrees — any match returns `true`
+- `subRoot` has same structure but different values
 
 ---
 
 ## Common Mistakes
 
-- Confusing subtree with subpath
-- Not checking both children equal
+- Checking `root.val == subRoot.val` as the only condition (ignores structural match)
+- Using `&&` instead of `||` for the left/right recursive calls (requires match in BOTH subtrees)
 
 ---
 
@@ -87,28 +102,28 @@ Serialize and substring—possible but heavier.
 
 | | |
 |--|--|
-| Time | O(mn) |
-| Space | O(h) |
+| Time | O(m × n) — m nodes × isSameTree O(n) |
+| Space | O(h_root) recursion |
 
 ---
 
 ## Similar Problems
 
-- [same-binary-tree](../same-binary-tree/README.md)
-- [invert-a-binary-tree](../invert-a-binary-tree/README.md)
+- [same-binary-tree](../same-binary-tree/README.md) — the subroutine used here
 
 ---
 
 ## One-line Takeaway
 
-**Subtree check → DFS + sameTree at each node.**
+**DFS every node as a candidate root; call `isSameTree(node, subRoot)` at each.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] sameTree helper
-- [ ] OR children
+- [ ] Base case: `root == null` → false (not null == null)?
+- [ ] Short-circuit `||` in the recursive call?
+- [ ] `isSameTree` as a separate subroutine?
 
 ---
 
@@ -116,4 +131,4 @@ Serialize and substring—possible but heavier.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

@@ -5,7 +5,7 @@
 | Topic | Stack |
 | Difficulty | Medium |
 | Primary Pattern | Monotonic Stack |
-| Secondary Pattern | Array |
+| Secondary Pattern | Next greater element |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,44 @@
 
 ## Problem Summary
 
-Interview problem `daily-temperatures`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an array `temperatures`, return an array `answer` where `answer[i]` is the number of days you have to wait after day `i` to get a warmer temperature. If no such day exists, `answer[i] = 0`.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ temperatures.length ≤ 10⁵`
+- `30 ≤ temperatures[i] ≤ 100`
+
+---
+
+## Brute Force
+
+For each day, scan rightward for the first warmer day → O(n²). Exceeds time limit.
 
 ---
 
 ## Core Observation
 
-Next greater temperature to the right—unresolved cooler days wait on stack.
+This is a **next greater element** problem. A monotonic decreasing stack holds days that have not yet found a warmer day. When a warmer day `i` arrives, every cooler stack entry is resolved: `answer[poppedIndex] = i - poppedIndex`.
 
 ---
 
 ## Thinking Process
 
-1. Scan i left to right
-2. While T[i] > stack top temp: pop, set wait days
-3. Push (T[i],i)
-4. Unpopped stay 0
+1. `Stack<int[]>` of `{temperature, index}`.
+2. For each day `i` with temperature `t`:
+   - While stack not empty and `t > stack.peek()[0]`: pop `pair`, set `res[pair[1]] = i - pair[1]`
+   - Push `{t, i}`
+3. Unresolved stack entries remain 0 (default array).
 
-**Best understanding:** Decreasing stack of (temp,index); pop when warmer, ans= i - idx
+`submission-0` and `submission-3` are identical — the final version.
 
 ---
 
 ## Why the Approach Works
 
-Each index pushed/popped once—amortized O(n) next-greater resolution.
+Each index is pushed once and popped at most once → amortized O(n). The stack stays strictly decreasing: any incoming temperature that beats the top resolves all topped-by temperatures in one while-loop sweep.
 
 ---
 
@@ -44,42 +58,46 @@ Each index pushed/popped once—amortized O(n) next-greater resolution.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Monotonic Stack |
-| Secondary | Array |
+| Primary | Monotonic decreasing stack |
+| Contrast | Online Stock Span uses ≤ (non-strictly), accumulating spans |
 
 ### Pattern Recognition Clues
 
-- Wait until strictly warmer day
-- Next greater element right
+- "How many days until a warmer / larger value"
+- "Next greater element to the right"
+- Answer depends on future events → defer resolution with a stack
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Stack](../Stack/README.md) · [PATTERNS.md](../../PATTERNS.md#monotonic-stack)
 
 ---
 
 ## Alternative Approaches
 
-Brute O(n²) inner scan.
+**Right-to-left scan with jumping:** For each `i` from right, jump by recorded distances to find next warmer — O(n) amortized, same result. Less intuitive.
 
 ---
 
 ## Critical Implementation Details
 
-- Store index for distance
-- Strict > comparison
+- Store **both** temperature and index on the stack — index is needed to compute the distance
+- Pop condition is strictly `t > stack.peek()[0]` (equal temperature = not warmer)
+- Result array initialized to 0; only resolved entries are written
 
 ---
 
 ## Edge Cases
 
-- Decreasing temps all 0
-- Last day 0
+- Strictly decreasing temps → all 0s (nothing ever popped)
+- Single element → `[0]`
+- Last day → always 0
 
 ---
 
 ## Common Mistakes
 
-- >= vs >
-- Stack without indices
+- Using `>=` instead of `>` in the pop condition (equal temp is not warmer)
+- Storing only temperature without index → can't compute distance
+- Using an increasing instead of decreasing monotonic stack
 
 ---
 
@@ -87,28 +105,30 @@ Brute O(n²) inner scan.
 
 | | |
 |--|--|
-| Time | O(n) |
-| Space | O(n) |
+| Time | O(n) amortized |
+| Space | O(n) for the stack |
 
 ---
 
 ## Similar Problems
 
-- [online-stock-span](../online-stock-span/README.md)
-- [sliding-window-maximum](../sliding-window-maximum/README.md)
+- [online-stock-span](../online-stock-span/README.md) — monotonic stack accumulating backwards spans
+- [asteroid-collision](../asteroid-collision/README.md) — stack collision simulation
 
 ---
 
 ## One-line Takeaway
 
-**Next greater right → decreasing monotonic stack with indices.**
+**Monotonic decreasing stack of (temp, index); pop on warmer day, answer = i − popped index.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Pop on warmer
-- [ ] ans = i - popped index
+- [ ] What is stored on the stack (value + index, not just value)?
+- [ ] Pop condition: `>` not `≥`?
+- [ ] Why does every index get pushed/popped at most once?
+- [ ] Difference vs Online Stock Span (direction, `≤` vs `>`)?
 
 ---
 
@@ -116,4 +136,4 @@ Brute O(n²) inner scan.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-3 |
+| — | Documented from `submission-0` / `submission-3` (identical optimal solutions) |

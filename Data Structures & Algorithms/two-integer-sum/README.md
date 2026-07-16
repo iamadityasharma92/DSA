@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Arrays & Hashing |
 | Difficulty | Easy |
-| Primary Pattern | Hashing |
-| Secondary Pattern | Array |
+| Primary Pattern | HashMap complement lookup |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `two-integer-sum`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an array of integers and a target, return the indices of the two numbers that add up to the target. Exactly one solution guaranteed.
+
+---
+
+## Constraints (typical)
+
+- `2 ≤ nums.length ≤ 10⁴`
+- Exactly one solution; cannot use same element twice
+- Return indices (not values)
+
+---
+
+## Brute Force
+
+All pairs O(n²) — try every combination until `nums[i] + nums[j] == target`. TLE.
 
 ---
 
 ## Core Observation
 
-Complement lookup in one pass finds pair summing to target.
+For each `nums[i]`, the complement `target - nums[i]` must also be in the array at some other index. A HashMap `{value → index}` gives O(1) complement lookup.
 
 ---
 
 ## Thinking Process
 
-1. map empty
-2. For each nums[i] need=target-nums[i]
-3. If need in map return [map[need],i]
-4. Else map[nums[i]]=i
-
-**Best understanding:** Map value→index; for x check if target-x seen return indices
+1. `map = HashMap<Integer, Integer>`.
+2. For each `i`:
+   - If `map.containsKey(target - nums[i])`: return `{map.get(target - nums[i]), i}`.
+   - `map.put(nums[i], i)`.
+3. Return empty (never reached if solution guaranteed).
 
 ---
 
 ## Why the Approach Works
 
-Hash gives O(1) complement test while building map.
+By adding to the map AFTER checking, we ensure we don't use the same index twice. The complement check finds the earlier occurrence in the map, and `i` is the current (later) occurrence — forming the pair.
 
 ---
 
@@ -44,42 +57,43 @@ Hash gives O(1) complement test while building map.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Hashing |
-| Secondary | Array |
+| Primary | HashMap complement lookup |
+| Extension | Two-integer-sum-ii (sorted array → two pointers) |
 
 ### Pattern Recognition Clues
 
-- Two sum unsorted
-- Return indices
+- "Two numbers summing to target, return indices"
+- Unsorted array → HashMap O(n)
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Arrays & Hashing](../Arrays%20%26%20Hashing/README.md) · [PATTERNS.md](../../PATTERNS.md#hashing--canonical-keys)
 
 ---
 
 ## Alternative Approaches
 
-Sort + two pointers if need values not indices.
+**Sort + two pointers:** destroys original indices. Only works when indices aren't needed.
 
 ---
 
 ## Critical Implementation Details
 
-- Check complement before insert
-- Single solution guaranteed
+- Check complement **before** inserting `nums[i]` into map — avoids using same index twice
+- `submission-2` adds the guard `i != j` which is redundant since complement is checked before insert
+- Returns `{j, i}` where `j < i` — smaller index first
 
 ---
 
 ## Edge Cases
 
-- Negative numbers
-- Same value used twice different indices
+- Duplicate values: `nums = [3, 3]`, `target = 6` → first 3 stored, second 3 finds its complement at index 0
+- Negative numbers — handled naturally by subtraction
 
 ---
 
 ## Common Mistakes
 
-- Adding before checking
-- Returning values not indices
+- Inserting before checking (can return the same index twice for `target = 2 * nums[i]`)
+- Not returning immediately on first match (problem guarantees unique solution)
 
 ---
 
@@ -87,28 +101,30 @@ Sort + two pointers if need values not indices.
 
 | | |
 |--|--|
-| Time | O(n) |
+| Time | O(n) expected |
 | Space | O(n) |
 
 ---
 
 ## Similar Problems
 
-- [two-integer-sum-ii](../two-integer-sum-ii/README.md)
-- [three-integer-sum](../three-integer-sum/README.md)
+- [two-integer-sum-ii](../two-integer-sum-ii/README.md) — sorted array, O(1) space with two pointers
+- [three-integer-sum](../three-integer-sum/README.md) — 3-sum with sorted + two-pointer inner loop
+- [4sum](../4sum/README.md) — 4-sum extension
 
 ---
 
 ## One-line Takeaway
 
-**Two sum unsorted → hash complement before insert.**
+**HashMap: check complement before insert; on match return {map[complement], i}.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] target-x lookup
-- [ ] store index
+- [ ] Insert before or after complement check?
+- [ ] How are duplicate values with same sum handled?
+- [ ] Why not sort + two-pointers here?
 
 ---
 
@@ -116,4 +132,4 @@ Sort + two pointers if need values not indices.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | Documented from `submission-2.java` |

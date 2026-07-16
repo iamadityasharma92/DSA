@@ -1,11 +1,11 @@
-# Is Palindrome
+# Valid Palindrome
 
 | Field | Value |
 |-------|-------|
 | Topic | Two Pointers |
 | Difficulty | Easy |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | String |
+| Primary Pattern | Two Pointers (converging) |
+| Secondary Pattern | String normalization |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,41 @@
 
 ## Problem Summary
 
-Interview problem `is-palindrome`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given string `s`, return `true` if it is a palindrome considering only alphanumeric characters and ignoring case.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ s.length ≤ 2 × 10⁵`
+- May contain spaces, punctuation, mixed case
+
+---
+
+## Brute Force
+
+Extract only alphanumeric chars into a new string, reverse, compare — O(n) but O(n) extra space for the cleaned string.
 
 ---
 
 ## Core Observation
 
-Palindrome reads same forward/back on processed alphanumeric chars.
+Strip non-alphanumeric characters (regex), lowercase, then apply the classic two-pointer palindrome check from both ends.
 
 ---
 
 ## Thinking Process
 
-1. Two pointers inward
-2. Skip non-alphanumeric
-3. tolower compare
-4. Mismatch → false
-
-**Best understanding:** l=0, r=n-1; skip non-alphanumeric; compare lowercased chars
+1. `s = s.replaceAll("[^a-zA-Z0-9]", "").toLowerCase()`.
+2. `l = 0`, `r = s.length() - 1`.
+3. While `l < r`: if `s.charAt(l++) != s.charAt(r--)` → return `false`.
+4. Return `true`.
 
 ---
 
 ## Why the Approach Works
 
-Only relevant chars matter; two pointers check symmetry O(n).
+Normalization reduces the problem to a standard palindrome check. Two-pointer comparison from both ends finds any mismatch in O(n) with O(1) pointer ops after the O(n) cleaning.
 
 ---
 
@@ -44,42 +55,46 @@ Only relevant chars matter; two pointers check symmetry O(n).
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | String |
+| Primary | Two pointers converging from both ends |
+| Alternative | Inline skip: advance pointers past non-alphanum without separate cleaning |
 
 ### Pattern Recognition Clues
 
-- Phrase palindrome ignoring punctuation
-- Case insensitive
+- "Palindrome ignoring non-alphanumeric"
+- Two-character symmetry check
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Two Pointers](../Two%20Pointers/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Reverse cleaned string.
+**In-place skip (space-efficient):** advance `l` and `r` while non-alphanumeric, then compare characters directly. O(n) time, O(1) extra space (no cleaned string needed).
 
 ---
 
 ## Critical Implementation Details
 
-- Character classification
-- Move pointers past junk
+- `replaceAll("[^a-zA-Z0-9]", "")` removes all non-alphanumeric — the second `replaceAll(" ", "")` in the submission is redundant (spaces already removed by first regex)
+- `toLowerCase()` before comparison
+- Post-increment/decrement: `s.charAt(l++) != s.charAt(r--)` in one expression
 
 ---
 
 ## Edge Cases
 
-- Empty after clean
-- All symbols → true
+- Empty string after cleaning → palindrome (true)
+- Single character → true
+- All non-alphanumeric → empty after clean → true
+- Case differences: `"A man a plan"` must lowercase correctly
 
 ---
 
 ## Common Mistakes
 
-- Not skipping symbols
-- Case-sensitive compare
+- Not lowercasing before comparison
+- Comparing characters before skipping non-alphanumeric (if using in-place approach)
+- Off-by-one: loop condition `l < r` not `l <= r`
 
 ---
 
@@ -88,27 +103,27 @@ Reverse cleaned string.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(1) |
+| Space | O(n) — cleaned string; O(1) with in-place pointer skip |
 
 ---
 
 ## Similar Problems
 
-- [valid-palindrome-ii](../valid-palindrome-ii/README.md)
-- [reverse-string](../reverse-string/README.md)
+- [valid-palindrome-ii](../valid-palindrome-ii/README.md) — at most one deletion allowed
 
 ---
 
 ## One-line Takeaway
 
-**String palindrome → two pointers skip non-alnum, lowercase compare.**
+**Normalize (strip non-alnum, lowercase), then two pointers from both ends.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Skip junk
-- [ ] Case fold
+- [ ] Regex pattern to keep only alphanumeric?
+- [ ] Why `l < r` not `l <= r`?
+- [ ] Describe the O(1) space in-place pointer approach.
 
 ---
 
@@ -116,4 +131,4 @@ Reverse cleaned string.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java` |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Stack |
 | Difficulty | Medium |
-| Primary Pattern | Stack |
-| Secondary Pattern | Design |
+| Primary Pattern | Auxiliary min-stack |
+| Secondary Pattern | Lazy sync (push only new minimums) |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,41 @@
 
 ## Problem Summary
 
-Interview problem `minimum-stack`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Design a stack supporting `push`, `pop`, `top`, and `getMin` — all in O(1) time. `getMin` returns the minimum element in the current stack.
+
+---
+
+## Constraints (typical)
+
+- At most `3 × 10⁴` operations
+- Stack non-empty when `pop`, `top`, `getMin` called
+
+---
+
+## Brute Force
+
+Scan all elements on each `getMin` → O(n). Too slow.
 
 ---
 
 ## Core Observation
 
-Each stack level knows minimum of all elements below including current.
+Maintain a **parallel min-stack** that always has the current minimum at its top. Only push to minStack when the new value is ≤ the current minimum. Pop from minStack only when the popped main value equals the current min.
 
 ---
 
 ## Thinking Process
 
-1. push: append val and min(val, stackMinTop)
-2. pop both stacks
-3. top normal stack
-4. getMin peek min stack
-
-**Best understanding:** Parallel stack stores min-so-far at each push depth
+1. `push(val)`: push `val` onto `s`. If `minStack.isEmpty() || val <= minStack.peek()` → push to `minStack`.
+2. `pop()`: pop from `s`. If popped value `== minStack.peek()` → pop from `minStack`.
+3. `top()` → `s.peek()`.
+4. `getMin()` → `minStack.peek()`.
 
 ---
 
 ## Why the Approach Works
 
-Cached min per depth gives O(1) getMin without scanning.
+The min-stack only tracks values that are minimums at some point. When the current minimum is removed from the main stack, it's removed from the min-stack too, revealing the previous minimum. `getMin` is always O(1).
 
 ---
 
@@ -44,42 +55,45 @@ Cached min per depth gives O(1) getMin without scanning.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Stack |
-| Secondary | Design |
+| Primary | Auxiliary monotonic stack (non-decreasing from bottom) |
+| Contrast | Another variant: push `{val, currentMin}` pairs on the main stack |
 
 ### Pattern Recognition Clues
 
-- getMin O(1)
-- Standard stack ops
+- "Stack with O(1) minimum"
+- Monotone auxiliary tracking
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Stack](../Stack/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Single stack store pairs (val,min).
+**Pair stack:** push `int[]{val, currentMin}` on the main stack. O(n) space same, but no separate minStack — simpler code.
 
 ---
 
 ## Critical Implementation Details
 
-- Push min before val or pair together
-- Pop sync both
+- Push to minStack when `val <= minStack.peek()` (not just `<`) — handles equal minimums (multiple copies of the same min value)
+- Pop from minStack only when popped value `== minStack.peek()` — not every pop
+- Both stacks must remain in sync: after `pop`, check before removing from minStack
 
 ---
 
 ## Edge Cases
 
-- Duplicate mins
-- pop until empty
+- Push same value twice → both pushes recorded in minStack
+- Pop one of the duplicate minimums → minStack still has the other copy
+- Pop all elements → both stacks empty
 
 ---
 
 ## Common Mistakes
 
-- Recomputing min on pop wrong
-- Empty getMin undefined
+- Using `<` instead of `<=` for minStack push (loses track of duplicate minimums)
+- Popping from minStack on every `pop` (removes minimum too aggressively)
+- Not checking `minStack.isEmpty()` before comparing in `push`
 
 ---
 
@@ -87,28 +101,28 @@ Single stack store pairs (val,min).
 
 | | |
 |--|--|
-| Time | O(1) all ops |
-| Space | O(n) |
+| Time | O(1) per operation |
+| Space | O(n) — both stacks |
 
 ---
 
 ## Similar Problems
 
-- [evaluate-reverse-polish-notation](../evaluate-reverse-polish-notation/README.md)
-- [implement-stack-using-queues](../implement-stack-using-queues/README.md)
+- [online-stock-span](../online-stock-span/README.md) — monotonic stack tracking spans
 
 ---
 
 ## One-line Takeaway
 
-**Min stack → auxiliary min-stack mirroring push/pop.**
+**Parallel min-stack: push when ≤ current min; pop when value == current min.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Sync push/pop
-- [ ] min-so-far
+- [ ] Why `<=` not `<` when pushing to minStack?
+- [ ] When is minStack popped (not every main pop)?
+- [ ] Alternative: pair-stack approach?
 
 ---
 
@@ -116,4 +130,4 @@ Single stack store pairs (val,min).
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | Documented from `submission-2.java` |

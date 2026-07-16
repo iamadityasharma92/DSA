@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Linked List |
 | Difficulty | Easy |
-| Primary Pattern | Floyd Cycle Detection |
-| Secondary Pattern | Two Pointers |
+| Primary Pattern | Floyd's Cycle Detection (fast/slow) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `linked-list-cycle-detection`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given the head of a linked list, return `true` if there is a cycle (some node's `next` points back to a previous node), `false` otherwise.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 10⁴`
+- Must be O(1) extra space
+
+---
+
+## Brute Force
+
+HashSet of visited nodes — O(n) time but O(n) space. Violates the O(1) space constraint.
 
 ---
 
 ## Core Observation
 
-Fast gains 1 step per iteration—inside cycle they must collide.
+A fast pointer (2 steps) and a slow pointer (1 step): if there is a cycle, the fast pointer laps the slow pointer inside the cycle and they meet. If no cycle, the fast pointer reaches `null`.
 
 ---
 
 ## Thinking Process
 
-1. slow=fast=head
-2. While fast and fast.next advance slow 1 fast 2
-3. Meet → true
-4. Fast hits null → false
-
-**Best understanding:** Slow+fast pointers; if they meet cycle exists
+1. `slow = head`, `fast = head`.
+2. While `fast.next != null && fast.next.next != null`:
+   - `slow = slow.next`
+   - `fast = fast.next.next`
+   - If `slow == fast` → return `true`.
+3. Return `false`.
 
 ---
 
 ## Why the Approach Works
 
-Relative speed 2:1 guarantees meeting inside cycle if present.
+In a cyclic list, the fast pointer gains one position on the slow pointer per step inside the cycle. Since the cycle is finite, they must eventually be at the same position. In an acyclic list, fast reaches `null` first.
 
 ---
 
@@ -44,42 +57,46 @@ Relative speed 2:1 guarantees meeting inside cycle if present.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Floyd Cycle Detection |
-| Secondary | Two Pointers |
+| Primary | Floyd's detect-only (phase 1 of full algorithm) |
+| Extended | Phase 2 (find cycle entry) used in find-duplicate-integer |
 
 ### Pattern Recognition Clues
 
-- Detect cycle boolean
-- O(1) space
+- "Cycle in linked list"
+- O(1) space constraint → rules out HashSet
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Linked List](../Linked%20List/README.md) · [PATTERNS.md](../../PATTERNS.md#floyd-cycle-fast--slow)
 
 ---
 
 ## Alternative Approaches
 
-HashSet of visited nodes—O(n) space.
+**HashSet:** add each node; on revisit → cycle. O(n) space — violates constraint but simpler to code.
 
 ---
 
 ## Critical Implementation Details
 
-- Check fast and fast.next before advance
-- Same meeting logic as duplicate number
+- Guard: `fast.next != null && fast.next.next != null` — check both before taking two steps
+- Both pointers start at `head` (not `head.next`)
+- Null `head` → return `false` immediately (or guard fails safely)
 
 ---
 
 ## Edge Cases
 
-- No cycle
-- Cycle not at head
+- Empty list → `false`
+- Single node pointing to itself → cycle
+- Two nodes with cycle
+- Very long list, cycle far from head
 
 ---
 
 ## Common Mistakes
 
-- Only moving fast one step
-- Null pointer on fast.next
+- Checking only `fast != null` (then `fast.next.next` can NPE)
+- Starting `fast` at `head.next` (misses some cycle configurations or wastes a step)
+- Using `==` on Integer wrapper values (fine for node references, but Integer cache only goes to 127)
 
 ---
 
@@ -94,21 +111,22 @@ HashSet of visited nodes—O(n) space.
 
 ## Similar Problems
 
-- [find-duplicate-integer](../find-duplicate-integer/README.md)
-- [remove-node-from-end-of-linked-list](../remove-node-from-end-of-linked-list/README.md)
+- [find-duplicate-integer](../find-duplicate-integer/README.md) — Floyd full algorithm (detect + find entry)
+- [reorder-linked-list](../reorder-linked-list/README.md) — also uses slow/fast for midpoint
 
 ---
 
 ## One-line Takeaway
 
-**Cycle detect → Floyd slow/fast until meet or null.**
+**Fast (×2) and slow (×1): they meet iff there's a cycle; guard both next steps.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Fast moves 2
-- [ ] Null guard
+- [ ] Guard condition: why `fast.next != null && fast.next.next != null`?
+- [ ] Where do both pointers start?
+- [ ] Contrast detect-only vs find-entry (2-phase Floyd)?
 
 ---
 
@@ -116,4 +134,4 @@ HashSet of visited nodes—O(n) space.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | Documented from `submission-2.java` |

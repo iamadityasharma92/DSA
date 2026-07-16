@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Two Pointers |
 | Difficulty | Easy |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | Array |
+| Primary Pattern | Two Pointers (in-place swap) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,39 @@
 
 ## Problem Summary
 
-Interview problem `reverse-string`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Reverse a character array in-place. Do not allocate extra space.
+
+---
+
+## Constraints (typical)
+
+- In-place O(1) extra space
+- Modify the input array directly
+
+---
+
+## Brute Force
+
+Create a new array in reverse order → O(n) space. Violates in-place constraint.
 
 ---
 
 ## Core Observation
 
-In-place char array reversal via symmetric swaps.
+Two pointers from both ends converging to center. Swap `s[l]` and `s[r]`, advance inward.
 
 ---
 
 ## Thinking Process
 
-1. l=0,r=n-1
-2. Swap chars
-3. l++,r--
-4. Stop when l>=r
-
-**Best understanding:** Swap s[l] and s[r] inward until l>=r
+1. `l = 0`, `r = s.length - 1`.
+2. While `l < r`: swap `s[l]` and `s[r]`, `l++`, `r--`.
 
 ---
 
 ## Why the Approach Works
 
-Pairwise swap mirrors string around center O(n/2).
+Swapping from both ends inward reverses all positions. The loop runs exactly `n/2` times; each swap handles two positions.
 
 ---
 
@@ -44,42 +53,40 @@ Pairwise swap mirrors string around center O(n/2).
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | Array |
+| Primary | Two-pointer in-place swap |
+| Foundation | Used in rotate-array (triple reverse), palindrome check |
 
 ### Pattern Recognition Clues
 
-- Reverse char array in-place
-- O(1) extra space
-
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+- "Reverse in-place"
+- No extra allocation allowed
 
 ---
 
 ## Alternative Approaches
 
-New char array from end.
+Stack-based reversal — O(n) space. Not appropriate here. XOR swap without temp variable — tricky if `l == r`.
 
 ---
 
 ## Critical Implementation Details
 
-- In-place swap
-- Stop at middle
+- `l < r` not `l <= r` (when `l == r` it's the middle element of an odd array — no swap needed)
+- Temp variable needed for swap (Java doesn't have tuple/destructuring)
 
 ---
 
 ## Edge Cases
 
-- Length 1
-- Palindrome unchanged
+- Empty or single char → loop doesn't execute, correct
+- Two chars → one swap
 
 ---
 
 ## Common Mistakes
 
-- Off-by-one loop bounds
-- Not in-place
+- `l <= r` (swaps middle element with itself — harmless but unnecessary)
+- Forgetting `r--` or `l++` (infinite loop)
 
 ---
 
@@ -94,21 +101,20 @@ New char array from end.
 
 ## Similar Problems
 
-- [is-palindrome](../is-palindrome/README.md)
-- [valid-palindrome-ii](../valid-palindrome-ii/README.md)
+- [rotate-array](../rotate-array/README.md) — uses three reverses of this exact operation
+- [is-palindrome](../is-palindrome/README.md) — convergent two-pointer comparison
 
 ---
 
 ## One-line Takeaway
 
-**Reverse string → two-pointer swap inward.**
+**Two pointers from ends: swap and converge; `l < r` stops at center.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] l r swap
-- [ ] in-place
+- [ ] Loop condition `l < r` not `l <= r`?
 
 ---
 
@@ -116,4 +122,4 @@ New char array from end.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

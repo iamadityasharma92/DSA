@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Linked List |
 | Difficulty | Medium |
-| Primary Pattern | Hash Map Clone |
-| Secondary Pattern | Linked List |
+| Primary Pattern | HashMap node cloning |
+| Secondary Pattern | Two-pass wiring |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,45 @@
 
 ## Problem Summary
 
-Interview problem `copy-linked-list-with-random-pointer`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+A linked list where each node also has a `random` pointer to any node in the list (or null). Return a **deep copy** — brand new nodes with same values and same structural `next`/`random` relationships.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 1000`
+- `random` can point to any node including itself, or `null`
+- Values may repeat — identity matters, not value
+
+---
+
+## Brute Force
+
+Clone all nodes, then for each random pointer walk the original list to find the target's position and index into the copy list → O(n²). Unacceptable.
 
 ---
 
 ## Core Observation
 
-Random pointers need stable mapping from original nodes to their clones.
+Random pointers need all copy nodes to **already exist** before they can be wired. Use a map from `originalNode → copyNode` built in pass 1; assign `next`/`random` in pass 2.
 
 ---
 
 ## Thinking Process
 
-1. Iterate list building HashMap old→clone
-2. Second pass assign next and random from map
-3. Return map.get(head)
-4. Null random stays null
+1. Pass 1: walk original list, create `map.put(node, new Node(node.val))` for every node.
+2. Pass 2: walk original again:
+   - `map.get(current).next = map.get(current.next)`
+   - `map.get(current).random = map.get(current.random)`
+3. Return `map.get(head)`.
 
-**Best understanding:** Map old→new node; pass 1 create clones, pass 2 wire next and random
+`submission-0` is the clean two-pass. `submission-1` handles `null` pointers inline by pre-inserting `map.put(null, null)` — slightly more verbose but avoids null checks.
 
 ---
 
 ## Why the Approach Works
 
-Clones must exist before random can reference another clone.
+The map translates any original node reference (including `null`) to its copy in O(1). Because all copies exist after pass 1, pass 2 can safely assign any pointer.
 
 ---
 
@@ -44,42 +59,45 @@ Clones must exist before random can reference another clone.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Hash Map Clone |
-| Secondary | Linked List |
+| Primary | Two-pass: create all nodes, then wire all edges |
+| Alternative | Interleave copies in the list (no extra map, O(1) space) |
 
 ### Pattern Recognition Clues
 
-- Deep copy with arbitrary pointers
-- Graph-like structure on list
+- "Deep copy with cross-referencing pointers"
+- Need all destinations to exist before connecting
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Linked List](../Linked%20List/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Interleave old/new nodes then split—O(1) extra space.
+**O(1) space:** interleave copies between original nodes (`1 → 1' → 2 → 2'`), set random pointers, then decouple. More complex to implement.
 
 ---
 
 ## Critical Implementation Details
 
-- Two passes
-- Key is node reference not value
+- `map.get(null)` in Java returns `null` by default — `submission-0` exploits this for `null` random/next
+- `submission-1` explicitly inserts `map.put(null, null)` as a safety guard
+- Return `map.get(head)`, **not** the dummy node used in some iterations
 
 ---
 
 ## Edge Cases
 
-- Empty list
-- Random to self
+- Empty list (`head == null`) → return `null`
+- Node whose `random` points to itself
+- All nodes have `random == null`
 
 ---
 
 ## Common Mistakes
 
-- Shallow copy of nodes
-- Value-based map keys
+- Wiring `random` in pass 1 before all copy nodes are created (NullPointerException or wrong target)
+- Shallow copy: reusing original node references in the copy list
+- Using `node.val` as a key instead of identity — breaks on duplicate values
 
 ---
 
@@ -88,27 +106,28 @@ Interleave old/new nodes then split—O(1) extra space.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(n) |
+| Space | O(n) — the map + output nodes |
 
 ---
 
 ## Similar Problems
 
-- [reorder-linked-list](../reorder-linked-list/README.md)
-- [merge-two-sorted-linked-lists](../merge-two-sorted-linked-lists/README.md)
+- [reorder-linked-list](../reorder-linked-list/README.md) — multi-step list manipulation
+- [reverse-a-linked-list](../reverse-a-linked-list/README.md) — fundamental wiring technique
 
 ---
 
 ## One-line Takeaway
 
-**Clone linked structure with extra pointers → HashMap old→new.**
+**Clone all nodes into a map first, then wire next and random via the map in a second pass.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Create all nodes first
-- [ ] Wire next and random
+- [ ] Why two passes instead of one?
+- [ ] What does `map.get(null)` return — and why does that help?
+- [ ] Describe the O(1) space interleaving alternative.
 
 ---
 
@@ -116,4 +135,4 @@ Interleave old/new nodes then split—O(1) extra space.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-0` (clean two-pass) and `submission-1` (explicit null guard) |

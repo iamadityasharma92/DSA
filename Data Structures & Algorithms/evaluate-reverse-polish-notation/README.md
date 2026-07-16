@@ -3,9 +3,9 @@
 | Field | Value |
 |-------|-------|
 | Topic | Stack |
-| Difficulty | Medium |
-| Primary Pattern | Stack |
-| Secondary Pattern | Parsing |
+| Difficulty | Easy |
+| Primary Pattern | Stack evaluation |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,46 @@
 
 ## Problem Summary
 
-Interview problem `evaluate-reverse-polish-notation`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Evaluate an arithmetic expression in Reverse Polish Notation (postfix). Tokens are integers or operators `+`, `-`, `*`, `/`. Division truncates toward zero. Guaranteed valid expression.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ tokens.length ≤ 10⁴`
+- Operands are valid 32-bit integers
+- Division by zero won't occur
+- Result fits in 32-bit integer
+
+---
+
+## Brute Force
+
+Parse into a tree / infix form first — unnecessary. Stack naturally models postfix.
 
 ---
 
 ## Core Observation
 
-Postfix order—operands ready on stack before operator applied.
+In postfix, each operator immediately follows its two operands. A stack makes this evaluation direct: push operands; when an operator appears, pop two, compute, push result.
 
 ---
 
 ## Thinking Process
 
-1. Scan tokens
-2. Number → push
-3. Operator → pop b,a compute push
-4. Final stack top is answer
-
-**Best understanding:** Stack numbers; on operator pop two, compute, push result
+1. Iterate tokens left to right.
+2. If token is a number: `push(parseInt(token))`.
+3. If token is an operator (`+`, `-`, `*`, `/`):
+   - `a = pop()` (right operand)
+   - `b = pop()` (left operand)
+   - push `b op a`
+4. After all tokens: `pop()` is the result.
 
 ---
 
 ## Why the Approach Works
 
-Stack holds pending operands in correct postfix evaluation order.
+Postfix is designed for stack machines — operators always have their operands ready at the stack top. The pop order (first pop = right, second = left) matches natural left-to-right expression order.
 
 ---
 
@@ -44,42 +60,46 @@ Stack holds pending operands in correct postfix evaluation order.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Stack |
-| Secondary | Parsing |
+| Primary | Stack — defer operands until operator arrives |
+| Same family | Baseball game, validate-parentheses |
 
 ### Pattern Recognition Clues
 
-- Postfix tokens
-- + - * / on integers
+- "Evaluate expression token by token"
+- Operators consume the two most recent values
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Stack](../Stack/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Recursive evaluation from end.
+Recursive descent parsing from an infix string — much more complex. Postfix avoids precedence and parentheses entirely.
 
 ---
 
 ## Critical Implementation Details
 
-- Pop order: second pop is right operand
-- Integer division trunc toward zero
+- **Pop order matters for `-` and `/`:** first pop is `a` (right), second pop is `b` (left) → compute `b - a`, `b / a`
+- Java integer division already truncates toward zero — no extra handling needed
+- Use `.equals()` to compare strings, not `==`
+- `Integer.parseInt()` to convert number tokens
 
 ---
 
 ## Edge Cases
 
-- Single number
-- Division truncates
+- Single number token → return it
+- Negative operands (`"-3"` is a valid number token)
+- `b / a` with truncation toward zero (not floor)
 
 ---
 
 ## Common Mistakes
 
-- Wrong operand order on - and /
-- Not handling negative parse
+- Reversing operands for `-` and `/` (`a - b` instead of `b - a`)
+- Using `==` to compare string operators instead of `.equals()`
+- Confusing floor division with truncation-toward-zero
 
 ---
 
@@ -88,27 +108,28 @@ Recursive evaluation from end.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(n) |
+| Space | O(n) — stack in worst case (all operands before one big operator) |
 
 ---
 
 ## Similar Problems
 
-- [validate-parentheses](../validate-parentheses/README.md)
-- [minimum-stack](../minimum-stack/README.md)
+- [baseball-game](../baseball-game/README.md) — stack with operation rules on score history
+- [validate-parentheses](../validate-parentheses/README.md) — stack matching
 
 ---
 
 ## One-line Takeaway
 
-**RPN → stack; pop order matters for non-commutative ops.**
+**Stack RPN: push numbers, operators pop right then left and push result.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Operand order
-- [ ] Push numbers
+- [ ] Which pop is the right operand and which is left?
+- [ ] Why does Java division already truncate toward zero?
+- [ ] Why `.equals()` not `==` for string comparison?
 
 ---
 
@@ -116,4 +137,4 @@ Recursive evaluation from end.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java` |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Design |
 | Difficulty | Easy |
-| Primary Pattern | Hashing |
-| Secondary Pattern | Array |
+| Primary Pattern | Direct-address boolean array |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,41 @@
 
 ## Problem Summary
 
-Interview problem `design-hashset`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Implement a HashSet without using built-in library sets: `add(key)`, `remove(key)`, `contains(key)`.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ key ≤ 10⁶`
+- At most `10⁴` operations
+
+---
+
+## Brute Force
+
+LinkedList of keys with linear scan for `contains`/`remove` → O(n). Correct but slow.
 
 ---
 
 ## Core Observation
 
-Set membership via hash buckets—duplicate keys ignored on add.
+Keys are bounded `[0, 10⁶]` — same as HashMap. A `boolean[1_000_001]` acts as a perfect bitset; each index is true if and only if that key is in the set.
 
 ---
 
 ## Thinking Process
 
-1. Buckets with lists
-2. hash(key) % M
-3. add: append if not in chain
-4. contains: scan chain
-
-**Best understanding:** Bucket array with chaining; add if absent, contains scans chain
+1. `boolean[] mset = new boolean[1_000_001]`; `Arrays.fill(mset, false)`.
+2. `add(key)` → `mset[key] = true`.
+3. `remove(key)` → `mset[key] = false`.
+4. `contains(key)` → `return mset[key]`.
 
 ---
 
 ## Why the Approach Works
 
-Same collision model as HashMap without value storage.
+Presence is a single bit per possible key. Direct indexing gives O(1) for all three operations. No hash collisions, no chaining.
 
 ---
 
@@ -44,42 +55,43 @@ Same collision model as HashMap without value storage.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Hashing |
-| Secondary | Array |
+| Primary | Direct-address bit array |
+| Upgrade | `BitSet` for denser memory if needed |
 
 ### Pattern Recognition Clues
 
-- Unique keys only
-- add/contains/remove API
-
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+- "Implement set" + bounded integer keys
+- Only need add/remove/contains (no key-value mapping)
 
 ---
 
 ## Alternative Approaches
 
-Boolean array if bounded key range.
+**Chaining hash set:** array of LinkedLists; `hash(key) % buckets`. O(1) amortized for general keys. Overkill here.
 
 ---
 
 ## Critical Implementation Details
 
-- Skip add if exists
-- Remove specific node from chain
+- Array size must be `10⁶ + 1` (index `10⁶` must be valid)
+- `boolean[]` default is already `false` — `Arrays.fill` is optional but explicit
+- `add` on already-present key is a no-op (idempotent)
+- `remove` on absent key is a no-op
 
 ---
 
 ## Edge Cases
 
-- add duplicate no-op
-- contains missing false
+- `add(0)`, `contains(0)` — minimum boundary
+- `add(1000000)`, `contains(1000000)` — maximum boundary
+- `remove` then `add` same key
 
 ---
 
 ## Common Mistakes
 
-- Always appending duplicates
-- Wrong bucket index
+- Array size `10⁶` instead of `10⁶ + 1` (index out of bounds on max key)
+- Implementing as LinkedList instead of using the bounded-key insight
 
 ---
 
@@ -87,28 +99,29 @@ Boolean array if bounded key range.
 
 | | |
 |--|--|
-| Time | O(1) average |
-| Space | O(n) |
+| Time | O(1) per operation |
+| Space | O(10⁶) — fixed |
 
 ---
 
 ## Similar Problems
 
-- [design-hashmap](../design-hashmap/README.md)
-- [duplicate-integer](../duplicate-integer/README.md)
+- [design-hashmap](../design-hashmap/README.md) — same pattern, stores values too
+- [duplicate-integer](../duplicate-integer/README.md) — set-based duplicate detection
 
 ---
 
 ## One-line Takeaway
 
-**HashSet = HashMap without values; check before add.**
+**Bounded keys → `boolean[10⁶+1]`; add/remove/contains are array reads/writes.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Dedup on add
-- [ ] Chain removal
+- [ ] Why size `10⁶ + 1`?
+- [ ] Difference vs HashMap design?
+- [ ] When would chaining be necessary?
 
 ---
 
@@ -116,4 +129,4 @@ Boolean array if bounded key range.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

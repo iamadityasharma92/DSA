@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Linked List |
 | Difficulty | Medium |
-| Primary Pattern | Linked List |
-| Secondary Pattern | Pointers |
+| Primary Pattern | In-place reversal of subrange |
+| Secondary Pattern | Dummy head + reconnection |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,45 @@
 
 ## Problem Summary
 
-Interview problem `reverse-linked-list-ii`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given the head of a singly linked list and two integers `l` and `r`, reverse the nodes from position `l` to `r` (1-indexed) in-place. Return the modified list.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ l ≤ r ≤ n ≤ 500`
+- Return the new head (may change if `l == 1`)
+
+---
+
+## Brute Force
+
+Extract nodes `l..r` into an array, reverse, reinsert → O(n) but conceptually messy.
 
 ---
 
 ## Core Observation
 
-Partial reverse by standard flip within bounds then wire head/tail bridges.
+Navigate to position `l-1` (the node just before the subrange). Reverse `r-l+1` nodes using the standard three-pointer technique. Then reconnect: `pre.next = reversed_head`, `prevNode.next = current` (where `prevNode` = original `l`-th node, now tail of reversed; `current` = node after `r`).
 
 ---
 
 ## Thinking Process
 
-1. Traverse to left predecessor
-2. Reverse nodes left through right
-3. Connect pred to new subhead
-4. Attach old subhead tail to suffix
-
-**Best understanding:** Reach node before left; reverse subsegment left..right; reconnect bridge
+1. `dummy.next = head`, `pre = dummy`.
+2. Navigate: `for i = 1 to l-1: pre = pre.next`.
+3. `prevNode = pre.next` (will become tail of reversed segment).
+4. Reverse `r-l+1` nodes from `pre.next`: standard `prev=null, current=pre.next`.
+5. Reconnect: `pre.next = prev` (new head of reversed segment); `prevNode.next = current` (node after `r`).
+6. Return `dummy.next`.
 
 ---
 
 ## Why the Approach Works
 
-Isolated segment reversal preserves outside list order.
+- `pre` anchors the node before the subrange so we can reattach the reversed head.
+- `prevNode` = original first node of subrange, which after reversal is the **tail** → it should point to `current` (node after `r`).
+- Dummy avoids special-casing `l == 1` (no node before position 1).
 
 ---
 
@@ -44,42 +59,47 @@ Isolated segment reversal preserves outside list order.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Linked List |
-| Secondary | Pointers |
+| Primary | Subrange reversal with reconnection |
+| Component | Standard three-pointer reversal for the inner segment |
+| Helper | Dummy head to handle `l == 1` uniformly |
 
 ### Pattern Recognition Clues
 
-- 1-indexed left right reverse
-- Single sublist flip
+- "Reverse subrange [l, r] of linked list"
+- Must reconnect before and after segments
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Linked List](../Linked%20List/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Array values reverse segment rebuild.
+Multiple passes — identify, extract, reverse, reinsert. More code, same complexity.
 
 ---
 
 ## Critical Implementation Details
 
-- Save connections before reverse
-- 1-based indexing conversion
+- Dummy head essential when `l = 1` (no real predecessor)
+- `prevNode = pre.next` BEFORE reversal — this stores the original `l`-th node (future tail)
+- Reverse exactly `r-l+1` nodes: `for(int i=0; i<r-l+1; i++)` iterations
+- After reversal: `pre.next = prev` (reversed head); `prevNode.next = current` (chain continuation)
 
 ---
 
 ## Edge Cases
 
-- left=right single node
-- Full list reverse
+- `l == r` → nothing to reverse; return head
+- `l == 1` → dummy ensures reconnection works without special case
+- Entire list `l=1, r=n`
 
 ---
 
 ## Common Mistakes
 
-- Off-by-one on 1-index
-- Broken bridge pointers
+- Not using dummy (crashes when `l == 1` — no node before it)
+- Forgetting `prevNode` variable (can't reconnect the reversed tail to the rest)
+- Reversing `r-l` instead of `r-l+1` nodes (misses one node)
 
 ---
 
@@ -94,21 +114,23 @@ Array values reverse segment rebuild.
 
 ## Similar Problems
 
-- [reverse-a-linked-list](../reverse-a-linked-list/README.md)
-- [reorder-linked-list](../reorder-linked-list/README.md)
+- [reverse-a-linked-list](../reverse-a-linked-list/README.md) — full reversal (foundation)
+- [reorder-linked-list](../reorder-linked-list/README.md) — uses partial reversal as a step
 
 ---
 
 ## One-line Takeaway
 
-**Reverse sublist → find pred, flip segment, reconnect.**
+**Navigate to l-1 (pre), save l-th node (prevNode), reverse r-l+1 nodes, reconnect pre and prevNode.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] pred before left
-- [ ] bridge ends
+- [ ] Why dummy head?
+- [ ] What does `prevNode` point to, and what becomes its `next` after reversal?
+- [ ] How many nodes to reverse: `r-l+1` not `r-l`?
+- [ ] Reconnection: `pre.next = prev`, `prevNode.next = current`?
 
 ---
 
@@ -116,4 +138,4 @@ Array values reverse segment rebuild.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-3 |
+| — | Documented from `submission-3.java` |

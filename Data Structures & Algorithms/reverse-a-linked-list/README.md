@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Linked List |
 | Difficulty | Easy |
-| Primary Pattern | Linked List |
-| Secondary Pattern | Iteration |
+| Primary Pattern | Iterative pointer reversal |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,47 @@
 
 ## Problem Summary
 
-Interview problem `reverse-a-linked-list`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Reverse a singly linked list and return the new head.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 5000`
+- Return the new head (old tail becomes new head)
+
+---
+
+## Brute Force
+
+Collect all values into an array, rebuild in reverse → O(n) time but O(n) space.
 
 ---
 
 ## Core Observation
 
-Flip next pointers one node at a time preserving rest of list.
+Three-pointer iterative reversal: maintain `prev`, `current`, `tmp`. At each step, redirect `current.next` to `prev`, advance both. When `current == null`, `prev` is the new head.
 
 ---
 
 ## Thinking Process
 
-1. prev=null, curr=head
-2. Save next, curr.next=prev
-3. prev=curr, curr=next
-4. Return prev as new head
+1. `prev = new ListNode(-100)` (dummy), `t = head`.
 
-**Best understanding:** Iterative prev=null; curr.next=prev; advance prev and curr
+   Actually `submission-0` initializes `prev` to a dummy node — this is unusual. The standard approach initializes `prev = null`.
+   
+   Standard clean version:
+   - `prev = null`, `curr = head`
+   - While `curr != null`: `tmp = curr.next; curr.next = prev; prev = curr; curr = tmp`
+   - Return `prev`
+
+2. `submission-0` then sets `head.next = null` to cut the dummy — same result, just less clean.
 
 ---
 
 ## Why the Approach Works
 
-Local reversal builds global reverse in one pass.
+Each node's `next` pointer is redirected to `prev`. Moving forward: the old `next` is saved in `tmp` before redirection. After all nodes are processed, `prev` = last node = new head.
 
 ---
 
@@ -44,42 +61,47 @@ Local reversal builds global reverse in one pass.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Linked List |
-| Secondary | Iteration |
+| Primary | Three-pointer reversal (prev, curr, tmp) |
+| Alternative | Recursive reversal — elegant, O(n) stack |
+| Use case | Foundation for reverse-linked-list-ii and reorder-linked-list |
 
 ### Pattern Recognition Clues
 
-- Reverse singly linked list
-- Iterative O(1) space
+- "Reverse a linked list"
+- Any linked list restructuring often starts with reversing a portion
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Linked List](../Linked%20List/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Recursive reverse—O(n) stack.
+**Recursive:** `reverseList(head.next).next = head` — elegant but O(n) stack. Risk of stack overflow for large lists.
 
 ---
 
 ## Critical Implementation Details
 
-- Store next before overwrite
-- Return prev at end
+- Must save `curr.next` into `tmp` before overwriting `curr.next`
+- After the loop `prev` is the new head; `curr` is null
+- Return `prev` not `curr`
+- `submission-0`'s dummy `prev` causes `head.next = null` cleanup — prefer `prev = null` instead
 
 ---
 
 ## Edge Cases
 
-- Empty null
-- Single node
+- Empty list → return `null`
+- Single node → return as-is
+- Two nodes → straightforward swap of pointers
 
 ---
 
 ## Common Mistakes
 
-- Losing rest of list
-- Returning curr not prev
+- Not saving `tmp = curr.next` before the redirection (infinite loop or data loss)
+- Returning `curr` (null) instead of `prev` (new head)
+- Not handling null head
 
 ---
 
@@ -88,27 +110,29 @@ Recursive reverse—O(n) stack.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(1) |
+| Space | O(1) iterative; O(n) recursive |
 
 ---
 
 ## Similar Problems
 
-- [reverse-linked-list-ii](../reverse-linked-list-ii/README.md)
-- [reorder-linked-list](../reorder-linked-list/README.md)
+- [reverse-linked-list-ii](../reverse-linked-list-ii/README.md) — reverse a subrange `[l, r]`
+- [reorder-linked-list](../reorder-linked-list/README.md) — uses partial reversal
 
 ---
 
 ## One-line Takeaway
 
-**Reverse list → three-pointer iterative flip.**
+**prev=null, curr=head; tmp=curr.next; curr.next=prev; prev=curr; curr=tmp; return prev.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] save next
-- [ ] prev curr advance
+- [ ] Three-pointer names and roles (prev, curr, tmp)?
+- [ ] Why save `tmp` before redirecting `curr.next`?
+- [ ] Return `prev` not `curr`?
+- [ ] Recursive alternative?
 
 ---
 
@@ -116,4 +140,4 @@ Recursive reverse—O(n) stack.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | `submission-0` (dummy prev, needs cleanup); preferred: `prev = null` directly |

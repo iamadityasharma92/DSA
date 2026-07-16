@@ -1,11 +1,11 @@
-# Number of One Bits
+# Number of 1 Bits (Hamming Weight)
 
 | Field | Value |
 |-------|-------|
 | Topic | Bit Manipulation |
 | Difficulty | Easy |
-| Primary Pattern | Bit Manipulation |
-| Secondary Pattern | Math |
+| Primary Pattern | Bit counting tricks |
+| Secondary Pattern | Brian Kernighan's algorithm |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,45 @@
 
 ## Problem Summary
 
-Interview problem `number-of-one-bits`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Return the number of `1` bits in the binary representation of an integer `n` (its "popcount" or Hamming weight).
+
+---
+
+## Constraints (typical)
+
+- `n` is a 32-bit unsigned integer
+
+---
+
+## Brute Force
+
+Check each of 32 bits via `n & 1` and right shift → O(32) = O(1). Always works.
 
 ---
 
 ## Core Observation
 
-n&(n-1) drops lowest set bit—count equals popcount.
+Three approaches, each O(1) for 32-bit integers:
+
+1. **`Integer.bitCount(n)`** — built-in (`submission-2`).
+2. **Brian Kernighan:** `while(n != 0) { n = n & (n-1); count++; }` — each step removes the lowest set bit.
+3. **Right-shift loop:** `while(n != 0) { count += n & 1; n >>>= 1; }` — use unsigned right shift `>>>` in Java.
 
 ---
 
 ## Thinking Process
 
-1. count=0
-2. While n>0: n&=n-1 count++
-3. Return count
-4. Alternative loop i<32 check bit
+`submission-2` uses `Integer.bitCount` — correct and optimal constant time. For interviews, the Brian Kernighan explanation is expected:
 
-**Best understanding:** While n: n &= n-1 clears LSB; count iterations
+- `n & (n-1)` clears the **lowest set bit** (subtracting 1 flips all bits from LSB to the first 1, then AND clears them). Repeat until 0; count = number of 1-bits.
 
 ---
 
 ## Why the Approach Works
 
-Each Kernighan step removes one 1-bit; iterations = popcount.
+**Brian Kernighan:** each `n & (n-1)` removes exactly one set bit. So the loop runs exactly `popcount(n)` times.
+
+**`Integer.bitCount`:** uses a parallel-prefix popcount in constant time (hardware or software bit tricks).
 
 ---
 
@@ -44,42 +59,44 @@ Each Kernighan step removes one 1-bit; iterations = popcount.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Bit Manipulation |
-| Secondary | Math |
+| Primary | `n & (n-1)` — remove lowest set bit |
+| Related | `n & 1` + right shift — bit-by-bit scan |
+| DP upgrade | counting-bits: `res[i] = res[i>>1] + (i&1)` |
 
 ### Pattern Recognition Clues
 
-- Hamming weight
-- Unsigned 32-bit
+- "Count set bits in single number"
+- `n & (n-1)` trick appears in balanced-binary-tree checks too
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Bit Manipulation](../Bit%20Manipulation/README.md) · [PATTERNS.md](../../PATTERNS.md#bit-tricks)
 
 ---
 
 ## Alternative Approaches
 
-Shift and test each bit—fixed 32 loops.
+All three are O(1) for 32-bit. Prefer Brian Kernighan in interviews (shows understanding of the bit trick).
 
 ---
 
 ## Critical Implementation Details
 
-- Treat as unsigned for Java >>> if needed
-- n&=n-1 termination
+- Java: use `>>>` (unsigned right shift) not `>>` (arithmetic) when testing `n & 1` in a loop — avoids issues with sign bit for negative numbers
+- `n & (n-1)` trick: works correctly for 0 (loop doesn't execute)
 
 ---
 
 ## Edge Cases
 
-- n=0
-- Power of two → 1
+- `n = 0` → 0 bits set
+- `n = -1` (all 1s in two's complement) → 32 bits set
+- Power of 2 → exactly 1 bit set (verified by `n & (n-1) == 0`)
 
 ---
 
 ## Common Mistakes
 
-- Signed shift bugs in Java
-- Infinite loop on negative
+- Using `>>` instead of `>>>` for signed integers when shifting right in the loop approach
+- Confusing this with `counting-bits` (this is for one number; that is for all 0..n)
 
 ---
 
@@ -87,28 +104,29 @@ Shift and test each bit—fixed 32 loops.
 
 | | |
 |--|--|
-| Time | O(k) k=set bits |
+| Time | O(1) — 32 bits fixed |
 | Space | O(1) |
 
 ---
 
 ## Similar Problems
 
-- [counting-bits](../counting-bits/README.md)
-- [single-number](../single-number/README.md)
+- [counting-bits](../counting-bits/README.md) — popcount for all 0..n (DP)
+- [single-number](../single-number/README.md) — XOR bit trick
 
 ---
 
 ## One-line Takeaway
 
-**Popcount → n &= n-1 loop or 32-bit scan.**
+**`n & (n-1)` removes lowest set bit; repeat and count iterations = Hamming weight.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Kernighan trick
-- [ ] Unsigned handling
+- [ ] What does `n & (n-1)` do to `n`?
+- [ ] Why `>>>` not `>>` in Java right-shift approach?
+- [ ] Three approaches and their trade-offs?
 
 ---
 
@@ -116,4 +134,4 @@ Shift and test each bit—fixed 32 loops.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | `submission-2` uses `Integer.bitCount`; interview expects Brian Kernighan |

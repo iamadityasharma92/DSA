@@ -1,11 +1,11 @@
-# Permutation String
+# Permutation in String
 
 | Field | Value |
 |-------|-------|
 | Topic | Sliding Window |
 | Difficulty | Medium |
-| Primary Pattern | Sliding Window |
-| Secondary Pattern | Hashing |
+| Primary Pattern | Fixed-size Sliding Window + frequency comparison |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `permutation-string`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given strings `s1` and `s2`, return `true` if any permutation of `s1` is a substring of `s2`.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ s1.length, s2.length ≤ 10⁴`
+- Lowercase English letters only
+
+---
+
+## Brute Force
+
+Generate all permutations of `s1` and check each in `s2` → O(n1! × n2). Completely infeasible.
 
 ---
 
 ## Core Observation
 
-Permutation equals identical multiset—fixed window frequency equality test.
+A permutation of `s1` is a rearrangement of the same characters — i.e., a substring of `s2` with the same length and the same character frequencies as `s1`. Slide a window of length `n1` over `s2` and compare frequency arrays at each position.
 
 ---
 
 ## Thinking Process
 
-1. Build c1 from s1
-2. Initial window c2 size n1
-3. Slide: if match return true
-4. Shrink left increment right updating c2
-
-**Best understanding:** Fixed window len s1 on s2; freq arrays match → true
+1. `c1[26]`, `c2[26]`. Populate both from first window (`s2[0..n1-1]`).
+2. `l = 0`, `r = n1` (slide from the first window forward).
+3. While `r < n2`:
+   - If `matches(c1, c2)` → return `true`.
+   - Else: `c2[s2[l++] - 'a']--`; `c2[s2[r++] - 'a']++`.
+4. Return `matches(c1, c2)` (check last window).
 
 ---
 
 ## Why the Approach Works
 
-Constant alphabet makes full freq compare O(26) per step.
+The window always has size `n1`. Sliding one step: remove the leftmost character, add the rightmost new one. Each of the `n2 - n1 + 1` windows is checked with O(26) comparison → O(26 × n2) = O(n2).
 
 ---
 
@@ -44,42 +57,47 @@ Constant alphabet makes full freq compare O(26) per step.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Sliding Window |
-| Secondary | Hashing |
+| Primary | Fixed-size sliding window with frequency fingerprint |
+| Contrast | Minimum window substring is variable size; this is fixed size |
+| Related | is-anagram: same-length comparison; this slides it over s2 |
 
 ### Pattern Recognition Clues
 
-- s2 contains perm of s1
-- Fixed window length
+- "Permutation as substring"
+- Fixed window size = len(s1)
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Sliding Window](../Sliding%20Window/README.md) · [PATTERNS.md](../../PATTERNS.md#sliding-window-variable--fixed)
 
 ---
 
 ## Alternative Approaches
 
-Sort substrings—slow.
+**Track `matches` count (26 chars):** increment/decrement an integer count instead of comparing all 26 entries each time → O(n2) with O(1) per slide. More optimal than O(26) per slide.
 
 ---
 
 ## Critical Implementation Details
 
-- Window size exactly len(s1)
-- Check last window after loop
+- Fill `c2` with the **first** window (`i < n1`) before starting the slide
+- The slide starts `r = n1` (already have the first window)
+- Check `matches` before sliding (checking current window) then slide
+- Final `matches(c1, c2)` checks the **last** window after `r` exits the loop
 
 ---
 
 ## Edge Cases
 
-- s2 shorter false
-- All same char
+- `n1 > n2` → return `false` immediately
+- `n1 == n2` → only one window to check
+- `s1` is entirely repeated characters
 
 ---
 
 ## Common Mistakes
 
-- Variable window wrong
-- Missing final match check
+- Forgetting the final `matches(c1, c2)` after the loop (misses the last window)
+- Sliding `r` but forgetting to slide `l` (window grows instead of shifts)
+- Checking after sliding instead of before (checks next window, not current)
 
 ---
 
@@ -87,28 +105,30 @@ Sort substrings—slow.
 
 | | |
 |--|--|
-| Time | O(n) |
-| Space | O(1) alphabet |
+| Time | O(26 × n2) = O(n2) |
+| Space | O(26) = O(1) |
 
 ---
 
 ## Similar Problems
 
-- [minimum-window-with-characters](../minimum-window-with-characters/README.md)
-- [is-anagram](../is-anagram/README.md)
+- [is-anagram](../is-anagram/README.md) — same-length frequency check
+- [minimum-window-with-characters](../minimum-window-with-characters/README.md) — variable window, superset check
+- [longest-repeating-substring-with-replacement](../longest-repeating-substring-with-replacement/README.md) — variable window, frequency tracking
 
 ---
 
 ## One-line Takeaway
 
-**Permutation in s2 → fixed window freq match.**
+**Fixed window of len(s1) sliding over s2; compare char frequency arrays for anagram match.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] len(s1) window
-- [ ] matches() helper
+- [ ] Window size is always `n1` — fixed, not variable?
+- [ ] Final `matches` call after loop — why needed?
+- [ ] Slide: remove `s2[l++]`, add `s2[r++]`?
 
 ---
 
@@ -116,4 +136,4 @@ Sort substrings—slow.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-7 |
+| — | Documented from `submission-7.java` (cleanest version) |

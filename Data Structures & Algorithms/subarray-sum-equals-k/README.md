@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| Topic | Prefix Sum |
+| Topic | Arrays & Hashing |
 | Difficulty | Medium |
-| Primary Pattern | Prefix Sum |
-| Secondary Pattern | Hashing |
+| Primary Pattern | Prefix Sum + HashMap |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,42 @@
 
 ## Problem Summary
 
-Interview problem `subarray-sum-equals-k`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an integer array `nums` and integer `k`, return the total count of contiguous subarrays whose sum equals `k`.
+
+---
+
+## Constraints (typical)
+
+- `-10⁴ ≤ nums[i] ≤ 10⁴`, `1 ≤ nums.length ≤ 2 × 10⁴`
+- `k` can be any integer
+- Array elements can be negative — sliding window won't work
+
+---
+
+## Brute Force
+
+All O(n²) subarrays with running sum → O(n²). TLE.
 
 ---
 
 ## Core Observation
 
-Subarray sum i..j = prefix[j]-prefix[i-1]; need prior prefix sum-k count.
+`sum[i..j] = prefixSum[j] - prefixSum[i-1]`. For `sum[i..j] == k`: `prefixSum[j] - k == prefixSum[i-1]`. Track prefix sum frequencies in a HashMap. For each new prefix sum, look up how many previous prefix sums equal `currentSum - k`.
 
 ---
 
 ## Thinking Process
 
-1. map{0:1} sum=0 ans=0
-2. Add num to sum
-3. ans += map.get(sum-k)
-4. map[sum]++
-
-**Best understanding:** Running sum; count map of prefix sums; add map.get(sum-k)
+1. `map.put(0, 1)` — prefix sum of 0 exists once (empty prefix before index 0).
+2. `sum = 0`, `ans = 0`.
+3. For each `n` in `nums`: `sum += n`; `ans += map.getOrDefault(sum - k, 0)`; `map.put(sum, map.getOrDefault(sum, 0) + 1)`.
+4. Return `ans`.
 
 ---
 
 ## Why the Approach Works
 
-Hash of prefix frequencies counts all starts giving target subarray ending here.
+`map.get(sum - k)` counts how many previous prefix sums differ from the current by exactly `k` — each such previous sum corresponds to a valid subarray ending at the current index. `map.put(0, 1)` handles subarrays starting at index 0 (where the entire prefix sum = k).
 
 ---
 
@@ -44,42 +56,45 @@ Hash of prefix frequencies counts all starts giving target subarray ending here.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Prefix Sum |
-| Secondary | Hashing |
+| Primary | Prefix sum + complement lookup in HashMap |
+| Contrast | Two-pointer sliding window only works for all-positive arrays |
 
 ### Pattern Recognition Clues
 
-- Count subarrays sum k
-- Includes negatives
+- "Count subarrays with sum == k"
+- Array has negative values → can't use sliding window
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Arrays & Hashing](../Arrays%20%26%20Hashing/README.md) · [PATTERNS.md](../../PATTERNS.md#prefix-sum)
 
 ---
 
 ## Alternative Approaches
 
-Prefix array brute O(n²).
+Two-pointer — only valid for all-positive arrays. Brute force O(n²) — always correct but slow.
 
 ---
 
 ## Critical Implementation Details
 
-- Initialize 0:1 for empty prefix
-- Add to ans before or after update consistently
+- `map.put(0, 1)` is essential — without it, subarrays starting from index 0 are missed
+- Look up **before** adding current sum to map (current index doesn't count as a "previous" prefix)
+- This works for negative elements — prefix sum can decrease
 
 ---
 
 ## Edge Cases
 
-- k=0 empty subarrays
-- All negatives
+- `k = 0` → counts subarrays summing to 0 (handled correctly)
+- Single element `== k` → found
+- All negative elements with negative `k`
 
 ---
 
 ## Common Mistakes
 
-- Forgetting map 0:1
-- Using only positive window
+- Forgetting `map.put(0, 1)` at initialization (misses subarrays starting from index 0)
+- Adding current sum to map before the lookup (overcounts by 1)
+- Using sliding window when elements can be negative
 
 ---
 
@@ -88,27 +103,28 @@ Prefix array brute O(n²).
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(n) |
+| Space | O(n) — map |
 
 ---
 
 ## Similar Problems
 
-- [minimum-size-subarray-sum](../minimum-size-subarray-sum/README.md)
-- [range-sum-query-2d-immutable](../range-sum-query-2d-immutable/README.md)
+- [range-sum-query-2d-immutable](../range-sum-query-2d-immutable/README.md) — 2D prefix sum
+- [minimum-size-subarray-sum](../minimum-size-subarray-sum/README.md) — min length, all positive (sliding window)
 
 ---
 
 ## One-line Takeaway
 
-**Count subarrays sum k → prefix sum + hashmap of counts.**
+**Prefix sum + HashMap: `ans += map[sum - k]`; init `map[0] = 1` for full-prefix subarrays.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] map 0:1
-- [ ] sum-k lookup
+- [ ] Why `map.put(0, 1)` before the loop?
+- [ ] Order: lookup before insert or insert before lookup?
+- [ ] Why can't we use sliding window here?
 
 ---
 
@@ -116,4 +132,4 @@ Prefix array brute O(n²).
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java` |

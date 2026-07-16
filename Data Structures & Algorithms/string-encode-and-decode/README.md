@@ -1,11 +1,11 @@
-# String Encode and Decode
+# Encode and Decode Strings
 
 | Field | Value |
 |-------|-------|
 | Topic | Arrays & Hashing |
 | Difficulty | Medium |
-| Primary Pattern | Encoding |
-| Secondary Pattern | String |
+| Primary Pattern | Length-prefixed encoding |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,49 @@
 
 ## Problem Summary
 
-Interview problem `string-encode-and-decode`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Design an algorithm to encode a list of strings into a single string, and decode it back. The strings may contain any characters including the delimiter character. The encode/decode pair must be invertible.
+
+---
+
+## Constraints (typical)
+
+- Strings can contain any byte character (including `/`, `|`, etc.)
+- Must handle empty strings
+- Encode + decode must be lossless
+
+---
+
+## Brute Force
+
+Join with a delimiter like `#` — fails if any string contains `#`.
 
 ---
 
 ## Core Observation
 
-Delimiter must not appear in length prefix scheme—length#payload is unambiguous.
+Prefix each string with its length and a separator character `|`. On decode, parse the length first (find `|`), then extract exactly that many characters — no need to scan for the delimiter in the content.
 
 ---
 
 ## Thinking Process
 
-1. encode: append len+'#'+str for each
-2. decode: read digits until #
-3. Read next len chars as string
-4. Repeat until end
+**Encode:**
+1. For each `str`: append `len(str) + "|" + str`.
+2. Return concatenated result.
 
-**Best understanding:** Length#delimiter encoding per string; decode reads len then exact chars
+**Decode:**
+1. `i = 0`.
+2. Find `j = indexOf('|', i)`.
+3. Parse `l = parseInt(str[i..j])`.
+4. Extract `str[j+1..j+1+l]`, add to list.
+5. `i = j + 1 + l`.
+6. Repeat.
 
 ---
 
 ## Why the Approach Works
 
-Length prefix tells exactly how many chars follow avoiding delimiter collisions.
+The length prefix + separator scheme means the decoder always knows exactly how many characters to read for each string, regardless of content. The `|` after the length is unambiguous because lengths are always purely numeric.
 
 ---
 
@@ -44,42 +63,47 @@ Length prefix tells exactly how many chars follow avoiding delimiter collisions.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Encoding |
-| Secondary | String |
+| Primary | Length-prefixed protocol encoding |
+| Alternative | Escape-based encoding (escape delimiter in strings) — more complex |
 
 ### Pattern Recognition Clues
 
-- Serialize string list
-- Handles any characters including delimiters
-
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+- "Encode/decode strings with arbitrary content"
+- Cannot use a fixed delimiter alone — content may contain it
 
 ---
 
 ## Alternative Approaches
 
-Escape delimiters—fragile.
+**4-byte length prefix:** binary encoding — 4 bytes for length, then content. More space-efficient, same idea.
+
+**Escaping:** double any `|` in content, then use `|` as delimiter. O(n) but more complex parsing.
 
 ---
 
 ## Critical Implementation Details
 
-- Parse length before #
-- Substring exact len after #
+- `str.indexOf('|', i)` finds the `|` **after position `i`** — critical when the string content contains `|`
+- Extraction is `substring(j+1, j+1+l)` (exclusive end in Java)
+- `i = j + 1 + l` — advance past the consumed string
+- `encode` uses `str.trim()` in submission — may truncate strings with trailing spaces; prefer no trim
 
 ---
 
 ## Edge Cases
 
-- Empty list
-- Empty strings in list
+- Empty string `""` → encoded as `"0|"`, decoded as `""`
+- String containing `|` or digits → length prefix handles correctly
+- List with one element
+- Empty list → empty encoded string
 
 ---
 
 ## Common Mistakes
 
-- Using comma join without escaping
-- Wrong length parse
+- Not encoding string length (delimiter-only approach fails on arbitrary content)
+- Wrong substring bounds (off-by-one on extraction)
+- `trim()` in encode — corrupts strings with trailing whitespace
 
 ---
 
@@ -87,28 +111,28 @@ Escape delimiters—fragile.
 
 | | |
 |--|--|
-| Time | O(total chars) |
-| Space | O(encoded size) |
+| Time | O(n) where n = total chars |
+| Space | O(n) |
 
 ---
 
 ## Similar Problems
 
-- [merge-strings-alternately](../merge-strings-alternately/README.md)
-- [valid-sudoku](../valid-sudoku/README.md)
+- [subarray-sum-equals-k](../subarray-sum-equals-k/README.md) — prefix sum; similar prefix-based reasoning
 
 ---
 
 ## One-line Takeaway
 
-**Encode string list → length#payload chunks.**
+**Encode: prepend `len|` before each string. Decode: parse length, extract exactly len chars.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] len#format
-- [ ] parse length first
+- [ ] Format: `len + "|" + string`?
+- [ ] Decode: `indexOf('|', i)` not `indexOf('|')`?
+- [ ] Why avoid fixed delimiter alone?
 
 ---
 
@@ -116,4 +140,4 @@ Escape delimiters—fragile.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java`; note: `trim()` in encode may corrupt trailing-space strings |

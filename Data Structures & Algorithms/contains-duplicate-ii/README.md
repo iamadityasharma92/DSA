@@ -4,7 +4,7 @@
 |-------|-------|
 | Topic | Sliding Window |
 | Difficulty | Easy |
-| Primary Pattern | Sliding Window |
+| Primary Pattern | Sliding Window + HashSet |
 | Secondary Pattern | Hashing |
 | Confidence | — |
 | Last Revision | Never |
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `contains-duplicate-ii`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an integer array `nums` and an integer `k`, return `true` if there exist two distinct indices `i` and `j` such that `nums[i] == nums[j]` and `|i - j| <= k`.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ nums.length ≤ 10⁵`, `0 ≤ k ≤ 10⁵`
+- Values can be any integer
+
+---
+
+## Brute Force
+
+`submission-0`: nested loop comparing all pairs within distance `k` → O(n·k). Too slow for large inputs.
 
 ---
 
 ## Core Observation
 
-Duplicate within distance k means same value reappears inside a k-wide index window.
+Only indices within distance `k` matter. A sliding window of size at most `k+1` with a set is enough — if the incoming value is already in the set, the two occurrences are within distance `k`.
 
 ---
 
 ## Thinking Process
 
-1. Scan with index i
-2. If nums[i] seen and i - map[nums[i]] ≤ k → true
-3. Update last index for nums[i]
-4. Finish → false
-
-**Best understanding:** Map value → last index; if i - last ≤ k return true
+1. `l = 0, r = 0`, empty `HashSet`.
+2. While `r < n`:
+   - If `r - l > k`: remove `nums[l]`, `l++` (shrink to window ≤ k+1)
+   - If `set.contains(nums[r])`: return `true`
+   - `set.add(nums[r])`; `r++`
+3. Return `false`.
 
 ---
 
 ## Why the Approach Works
 
-Only latest index matters for future distance checks.
+The set always holds the last `≤ k+1` distinct-position values. Membership in this window guarantees the two equal values are at most `k` apart.
 
 ---
 
@@ -44,42 +57,46 @@ Only latest index matters for future distance checks.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Sliding Window |
-| Secondary | Hashing |
+| Primary | Fixed-bound sliding window (at most `k+1` elements) |
+| Secondary | HashSet for O(1) membership |
+| Alternative | HashMap `value → last index`; check `i - map.get(val) ≤ k` |
 
 ### Pattern Recognition Clues
 
-- Equal values at most k indices apart
-- Streaming index constraint
+- "Duplicate within distance k"
+- Need to detect repetition in a recent window of values
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Sliding Window](../Sliding%20Window/README.md) · [PATTERNS.md](../../PATTERNS.md#sliding-window-variable--fixed)
 
 ---
 
 ## Alternative Approaches
 
-HashSet window of size k+1 with eviction.
+**Map approach:** `map.put(nums[i], i)` — on collision check `i - map.get(nums[i]) ≤ k`. O(n) time, same space. Slightly simpler code than the window set.
 
 ---
 
 ## Critical Implementation Details
 
-- Index distance not value distance
-- Update map after check
+- Shrink condition is `r - l > k` (window size `> k+1`), so remove before checking
+- Check membership **before** `set.add` — adding first would hide the collision check
+- `l` advances only when window exceeds `k`
 
 ---
 
 ## Edge Cases
 
-- k = 0
-- No pair exists
+- `k = 0` → no two equal values at distance 0 are valid (`i ≠ j` required), always `false`
+- All elements unique → `false`
+- Array with one element → `false`
 
 ---
 
 ## Common Mistakes
 
-- Using value difference
-- Not updating stored index
+- Using `r - l >= k` instead of `> k` (off-by-one, misses valid pairs at exactly distance `k`)
+- Checking membership after `add` (the new element overwrites the duplicate signal)
+- Removing `nums[r]` instead of `nums[l]` when shrinking
 
 ---
 
@@ -88,27 +105,28 @@ HashSet window of size k+1 with eviction.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(min(n,k)) |
+| Space | O(min(n, k)) — window set size |
 
 ---
 
 ## Similar Problems
 
-- [duplicate-integer](../duplicate-integer/README.md)
-- [longest-substring-without-duplicates](../longest-substring-without-duplicates/README.md)
+- [duplicate-integer](../duplicate-integer/README.md) — simpler: any duplicate anywhere
+- [longest-substring-without-duplicates](../longest-substring-without-duplicates/README.md) — same window set mechanics
 
 ---
 
 ## One-line Takeaway
 
-**Index-distance duplicate check → last-seen map or size-(k+1) window.**
+**Slide a k+1-wide set; if the incoming value is already in it, found duplicate within k.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] i - prevIndex ≤ k
-- [ ] Update on each step
+- [ ] Why shrink when `r - l > k`, not `≥ k`?
+- [ ] Why check `contains` before `add`?
+- [ ] Alternative: index map instead of window set?
 
 ---
 
@@ -116,4 +134,4 @@ HashSet window of size k+1 with eviction.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-0` (brute) → `submission-1` (sliding window) |

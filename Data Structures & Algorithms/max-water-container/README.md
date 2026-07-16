@@ -1,11 +1,11 @@
-# Max Water Container
+# Container with Most Water
 
 | Field | Value |
 |-------|-------|
 | Topic | Two Pointers |
 | Difficulty | Medium |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | Greedy |
+| Primary Pattern | Two Pointers (converging) |
+| Secondary Pattern | Greedy: advance the shorter side |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `max-water-container`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given `n` vertical lines, find two lines that together with the x-axis form a container holding the most water. Return the maximum area.
+
+---
+
+## Constraints (typical)
+
+- `n ≥ 2`
+- `0 ≤ height[i] ≤ 10⁴`
+
+---
+
+## Brute Force
+
+Try all pairs → O(n²). TLE.
 
 ---
 
 ## Core Observation
 
-Width shrinks every step—only moving shorter line can improve area.
+Area = `min(h[l], h[r]) × (r - l)`. Two pointers start at maximum width. The only way to potentially increase area is to move the shorter pointer inward (the taller pointer staying can't help — width decreases).
 
 ---
 
 ## Thinking Process
 
-1. Two ends
-2. Compute area update max
-3. If h[l]<h[r] l++ else r--
-4. Until l<r
-
-**Best understanding:** l=0,r=n-1; area=min(h[l],h[r])*(r-l); move shorter side inward
+1. `l = 0`, `r = n - 1`, `ans = 0`.
+2. While `l < r`:
+   - `area = (r - l) × min(h[l], h[r])`
+   - `ans = max(ans, area)`
+   - Advance the shorter pointer: if `h[l] <= h[r]` → `l++`; else `r--`.
+3. Return `ans`.
 
 ---
 
 ## Why the Approach Works
 
-Moving taller side cannot increase min height while width decreases.
+When we advance the shorter pointer, we correctly discard its pairings with all interior lines — none of those could exceed the current area (smaller width, bounded by the shorter height). The greedy choice is provably optimal.
 
 ---
 
@@ -44,42 +57,45 @@ Moving taller side cannot increase min height while width decreases.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | Greedy |
+| Primary | Two pointers converging — advance the limiting side |
+| Contrast | `trapping-rain-water` also uses two pointers but accumulates trapped water differently |
 
 ### Pattern Recognition Clues
 
-- Max area between lines
-- Greedy pointer move
+- "Maximum area / water between boundaries"
+- Start at widest gap and squeeze inward
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Two Pointers](../Two%20Pointers/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Brute all pairs O(n²).
+O(n²) brute force — all pairs. No other known O(n) approach.
 
 ---
 
 ## Critical Implementation Details
 
-- Move shorter height pointer
-- Area uses min heights
+- Area computed **before** advancing the pointer — after advance the pair no longer exists
+- `h[l] <= h[r]` → advance `l` (equal heights → advance either; advancing `l` is fine)
+- Width is `r - l`, not `r - l + 1`
 
 ---
 
 ## Edge Cases
 
-- Two lines
-- All equal heights
+- Two elements → single pair
+- All same height → widest pair wins
+- Monotonically increasing heights → last pair wins
 
 ---
 
 ## Common Mistakes
 
-- Moving taller side
-- Using max not min height
+- Advancing the taller pointer instead of shorter (suboptimal, may miss the answer)
+- Computing area after the pointer move (pointer has already changed, wrong pair)
+- `r - l + 1` width (off by one — no containers at same index)
 
 ---
 
@@ -94,21 +110,21 @@ Brute all pairs O(n²).
 
 ## Similar Problems
 
-- [trapping-rain-water](../trapping-rain-water/README.md)
-- [two-integer-sum-ii](../two-integer-sum-ii/README.md)
+- [trapping-rain-water](../trapping-rain-water/README.md) — two pointer accumulation of trapped water
 
 ---
 
 ## One-line Takeaway
 
-**Container water → two pointers move shorter side.**
+**Two pointers from ends; advance the shorter side; area = min(h) × width.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] min height area
-- [ ] shorter moves
+- [ ] Why advance the shorter pointer, not the taller?
+- [ ] Compute area before or after advancing?
+- [ ] How does this differ from trapping-rain-water?
 
 ---
 
@@ -116,4 +132,4 @@ Brute all pairs O(n²).
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-3 |
+| — | Documented from `submission-3.java` |

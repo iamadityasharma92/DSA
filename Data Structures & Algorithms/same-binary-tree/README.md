@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Trees |
 | Difficulty | Easy |
-| Primary Pattern | DFS |
-| Secondary Pattern | Recursion |
+| Primary Pattern | DFS structural comparison |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,40 @@
 
 ## Problem Summary
 
-Interview problem `same-binary-tree`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given the roots of two binary trees `p` and `q`, return `true` if they are structurally identical with the same node values, `false` otherwise.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 100`
+- Values fit in int
+
+---
+
+## Brute Force
+
+No meaningful brute force — recursive DFS is both the simplest and optimal approach.
 
 ---
 
 ## Core Observation
 
-Structural equality requires matching values and identical subtree shapes.
+Two trees are the same if: both null (base case, same), or one null/values differ (false), or current values match AND left subtrees match AND right subtrees match.
 
 ---
 
 ## Thinking Process
 
-1. Base null checks
-2. Compare root.val
-3. sameTree(left) and sameTree(right)
-4. Short-circuit false
-
-**Best understanding:** Both null true; one null false; vals equal and recurse left/right
+1. `if p == null && q == null` → `true`
+2. `if p == null || q == null || p.val != q.val` → `false`
+3. `return isSameTree(p.left, q.left) && isSameTree(p.right, q.right)`
 
 ---
 
 ## Why the Approach Works
 
-Recursive decomposition checks local root then both subtrees.
+Structural equality requires matching at every position. The recursive calls cover every node pair simultaneously. `&&` short-circuits on first mismatch — efficient.
 
 ---
 
@@ -44,42 +54,47 @@ Recursive decomposition checks local root then both subtrees.
 
 | Role | Pattern |
 |------|---------|
-| Primary | DFS |
-| Secondary | Recursion |
+| Primary | Pre-order structural DFS (check current, then recurse) |
+| Related | subtree-of-a-binary-tree uses this as a subroutine |
 
 ### Pattern Recognition Clues
 
-- Identical tree structure and values
-- Boolean equality
+- "Are two trees identical?"
+- Subroutine for subtree check
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Trees](../Trees/README.md)
 
 ---
 
 ## Alternative Approaches
 
-BFS queue pair-wise compare.
+Serialize both trees to strings and compare — O(n) but O(n) extra space. Less efficient.
+
+**BFS (level order):** use queues to compare level by level. O(n) same.
 
 ---
 
 ## Critical Implementation Details
 
-- Null symmetry first
-- Value compare after structure
+- Null-null check returns `true` first — base case
+- Order of conditions in the `if false` case: null-null handled already; `||` catches single null or value mismatch
+- `&&` is critical (not `||`) — both subtrees must match
 
 ---
 
 ## Edge Cases
 
-- Both empty true
-- Mirror shapes different values false
+- Both empty → `true`
+- One empty, one non-empty → `false`
+- Same structure, different values → `false`
+- Same values, different structure → `false`
 
 ---
 
 ## Common Mistakes
 
-- Only comparing values not structure
-- Missing null asymmetry
+- Checking `p.val != q.val` before the null checks → NPE
+- Using `||` in the recursive call (only one subtree matching is not sufficient)
 
 ---
 
@@ -88,27 +103,28 @@ BFS queue pair-wise compare.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(h) |
+| Space | O(h) recursion stack |
 
 ---
 
 ## Similar Problems
 
-- [subtree-of-a-binary-tree](../subtree-of-a-binary-tree/README.md)
-- [invert-a-binary-tree](../invert-a-binary-tree/README.md)
+- [subtree-of-a-binary-tree](../subtree-of-a-binary-tree/README.md) — calls `isSameTree` as a helper
+- [invert-a-binary-tree](../invert-a-binary-tree/README.md) — similar DFS structure
 
 ---
 
 ## One-line Takeaway
 
-**Same tree → null symmetry + val + both subtrees.**
+**null-null → true; null mismatch or val mismatch → false; AND of left-same AND right-same.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] null cases
-- [ ] val and children
+- [ ] Base case order: null-null check first?
+- [ ] `&&` in recursive call (both subtrees must match)?
+- [ ] How is this used in subtree-of-a-binary-tree?
 
 ---
 
@@ -116,4 +132,4 @@ BFS queue pair-wise compare.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Two Pointers |
 | Difficulty | Medium |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | Array |
+| Primary Pattern | Two Pointers (sorted array) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `two-integer-sum-ii`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given a **sorted** (ascending) 1-indexed array, return the 1-indexed indices `[i, j]` where `nums[i] + nums[j] == target`. Exactly one solution. Use O(1) space.
+
+---
+
+## Constraints (typical)
+
+- Array is sorted ascending (key constraint enabling two pointers)
+- 1-indexed output: `i < j`
+- O(1) extra space required
+
+---
+
+## Brute Force
+
+All pairs → O(n²). Violates time.
 
 ---
 
 ## Core Observation
 
-Monotonic sum movement toward target on sorted array.
+Sorted array + sum target → two-pointer technique. Start at both ends: if `sum < target`, advance left; if `sum > target`, advance right; if `== target`, return.
 
 ---
 
 ## Thinking Process
 
-1. l left r right
-2. sum = numbers[l]+numbers[r]
-3. Too small l++ too big r--
-4. Match return [l+1,r+1]
-
-**Best understanding:** Sorted array: l=0,r=n-1; if sum<target l++ else if >target r-- else return 1-indexed
+1. `l = 0`, `r = n-1`.
+2. While `l < r`: `sum = nums[l] + nums[r]`.
+3. `sum == k` → return `{l+1, r+1}` (1-indexed).
+4. `sum < k` → `l++` (need larger).
+5. `sum > k` → `r--` (need smaller).
 
 ---
 
 ## Why the Approach Works
 
-Increasing l raises sum; decreasing r lowers sum—converges to target.
+In a sorted array, `nums[l] + nums[r]` is the sum of the smallest and largest available values. If it's too small, the only way to increase is to move `l` right. If too large, move `r` left. Converging pointers cover all necessary pairs.
 
 ---
 
@@ -44,42 +57,43 @@ Increasing l raises sum; decreasing r lowers sum—converges to target.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | Array |
+| Primary | Two pointers on sorted array for pair sum |
+| Contrast | two-integer-sum (unsorted) → HashMap O(n) space |
 
 ### Pattern Recognition Clues
 
-- Sorted input 1-indexed answer
-- Exactly one solution
+- "Two sum in sorted array, O(1) space"
+- Sorted property enables converging pointers
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Two Pointers](../Two%20Pointers/README.md) · [PATTERNS.md](../../PATTERNS.md#two-pointers)
 
 ---
 
 ## Alternative Approaches
 
-HashMap works but wastes sorted property.
+Binary search: for each `nums[l]`, binary search for `target - nums[l]` in the right portion → O(n log n). Same space but slower.
 
 ---
 
 ## Critical Implementation Details
 
-- 1-indexed output
-- Single solution moves uniquely
+- Output is 1-indexed: return `{l+1, r+1}`
+- `while(l < r)` not `l <= r` — problem guarantees a solution; equal indices invalid
+- Advance the pointer on the limiting side (smaller sum → advance left; larger → advance right)
 
 ---
 
 ## Edge Cases
 
-- Two elements
-- Large gap pointers
+- Sum achieved immediately (`nums[0] + nums[n-1] == target`)
+- Numbers at adjacent indices
 
 ---
 
 ## Common Mistakes
 
-- 0-indexed return
-- Using hash ignoring sorted
+- Returning 0-indexed instead of 1-indexed
+- `l <= r` in loop condition (meaningless when `l == r`, single element can't form pair)
 
 ---
 
@@ -94,21 +108,22 @@ HashMap works but wastes sorted property.
 
 ## Similar Problems
 
-- [two-integer-sum](../two-integer-sum/README.md)
-- [three-integer-sum](../three-integer-sum/README.md)
+- [two-integer-sum](../two-integer-sum/README.md) — unsorted, HashMap approach
+- [three-integer-sum](../three-integer-sum/README.md) — same two-pointer inner loop on sorted array
 
 ---
 
 ## One-line Takeaway
 
-**Two sum sorted → opposite pointers adjust sum.**
+**Sorted array: two pointers from ends; advance smaller sum's pointer; return 1-indexed.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] l r pointers
-- [ ] 1-indexed pair
+- [ ] Why O(1) space here but O(n) for unsorted variant?
+- [ ] When to advance `l` vs `r`?
+- [ ] 1-indexed output: `l+1`, `r+1`?
 
 ---
 
@@ -116,4 +131,4 @@ HashMap works but wastes sorted property.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java` |

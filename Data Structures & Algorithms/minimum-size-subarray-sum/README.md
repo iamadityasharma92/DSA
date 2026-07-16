@@ -4,7 +4,7 @@
 |-------|-------|
 | Topic | Sliding Window |
 | Difficulty | Medium |
-| Primary Pattern | Sliding Window |
+| Primary Pattern | Variable Sliding Window |
 | Secondary Pattern | Two Pointers |
 | Confidence | — |
 | Last Revision | Never |
@@ -13,30 +13,44 @@
 
 ## Problem Summary
 
-Interview problem `minimum-size-subarray-sum`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given a positive integer array and a target, find the minimum length of a contiguous subarray whose sum is ≥ target. Return 0 if no such subarray exists.
+
+---
+
+## Constraints (typical)
+
+- All elements positive — key property enabling sliding window
+- `1 ≤ nums[i] ≤ 10⁴`, `1 ≤ target ≤ 10⁹`
+
+---
+
+## Brute Force
+
+All O(n²) subarrays with prefix sum check — O(n²). Binary search on prefix sums can do O(n log n).
 
 ---
 
 ## Core Observation
 
-Positive nums → expanding sum monotonic; shrink when valid to minimize.
+Since all elements are positive, adding more elements increases the sum and removing decreases it — the monotone property that makes sliding window valid. Expand right until sum ≥ target, then shrink left while maintaining it.
 
 ---
 
 ## Thinking Process
 
-1. l=0,sum=0
-2. Add nums[r], r++
-3. While sum≥target update min, subtract nums[l], l++
-4. Return min or 0
+`submission-1` uses two phases:
+1. **Phase 1 (expand):** while `r < n`, if `sum < target` → add `nums[r++]`; else → record `mini = min(mini, r-l)`, subtract `nums[l++]`.
+2. **Phase 2 (drain left):** when `r == n`, keep shrinking while `sum >= target`.
 
-**Best understanding:** Expand r adding sum; while sum≥target shrink l tracking min length
+Simpler standard pattern:
+1. Expand `r`, add to `sum`.
+2. While `sum >= target`: record `min(mini, r-l+1)`, subtract `nums[l++]`.
 
 ---
 
 ## Why the Approach Works
 
-Two pointers capture all minimal valid windows without restart.
+All elements positive → sum is monotone in window size. Expanding right and shrinking left when valid guarantees every subarray is checked. The shortest valid window is captured at the tightest shrink point.
 
 ---
 
@@ -44,42 +58,46 @@ Two pointers capture all minimal valid windows without restart.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Sliding Window |
-| Secondary | Two Pointers |
+| Primary | Variable sliding window — expand right, shrink left on validity |
+| Key constraint | All positive (enables monotone sum property) |
 
 ### Pattern Recognition Clues
 
-- Subarray sum at least target
-- Positive integers
+- "Minimum subarray with sum ≥ target"
+- All elements positive — shrinking is safe
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Sliding Window](../Sliding%20Window/README.md) · [PATTERNS.md](../../PATTERNS.md#sliding-window-variable--fixed)
 
 ---
 
 ## Alternative Approaches
 
-Prefix sum + BS per index.
+**Binary search on prefix sums:** O(n log n). Useful when elements can be negative (though sliding window fails then anyway).
 
 ---
 
 ## Critical Implementation Details
 
-- Positive nums required for shrink logic
-- Update min inside while valid
+- `submission-1`'s two-phase structure handles the remaining valid windows after `r` reaches `n`
+- Return `0` if `mini == Integer.MAX_VALUE` (no valid subarray)
+- Window length at shrink point: `r - l` in `submission-1`'s notation (since `r` has already been incremented) vs `r - l + 1` in standard style
+- Positive elements only — sliding window breaks for negative values
 
 ---
 
 ## Edge Cases
 
-- No valid window 0
-- Single element equals target
+- No valid subarray → return 0
+- Single element ≥ target → return 1
+- Entire array needed → return n
 
 ---
 
 ## Common Mistakes
 
-- Using on negative numbers
-- Not shrinking enough
+- Applying sliding window when elements can be negative (wrong)
+- Off-by-one in window length calculation (depends on when `r` is incremented)
+- Not handling the "remaining valid windows after r = n" case
 
 ---
 
@@ -87,28 +105,29 @@ Prefix sum + BS per index.
 
 | | |
 |--|--|
-| Time | O(n) |
+| Time | O(n) — each element added and removed at most once |
 | Space | O(1) |
 
 ---
 
 ## Similar Problems
 
-- [minimum-window-with-characters](../minimum-window-with-characters/README.md)
-- [subarray-sum-equals-k](../subarray-sum-equals-k/README.md)
+- [longest-substring-without-duplicates](../longest-substring-without-duplicates/README.md) — variable window with set
+- [minimum-window-with-characters](../minimum-window-with-characters/README.md) — variable window with frequency map
 
 ---
 
 ## One-line Takeaway
 
-**Min len subarray ≥ target (positive) → shrinkable sliding window.**
+**Positive elements → sliding window: expand right, shrink left while sum ≥ target; track min length.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Expand then shrink
-- [ ] Track min len
+- [ ] Why must all elements be positive for sliding window to work?
+- [ ] When to record `mini`: before or after shrinking `l`?
+- [ ] What to return when no subarray satisfies the condition?
 
 ---
 
@@ -116,4 +135,4 @@ Prefix sum + BS per index.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java` |

@@ -3,9 +3,9 @@
 | Field | Value |
 |-------|-------|
 | Topic | Linked List |
-| Difficulty | Easy |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | Linked List |
+| Difficulty | Medium |
+| Primary Pattern | Two Pointers (n-gap) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `remove-node-from-end-of-linked-list`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given the head of a linked list and integer `n`, remove the n-th node from the **end** and return the head.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ n ≤ list length`
+- n is always valid
+
+---
+
+## Brute Force
+
+Two passes: first count length `L`, then remove node at `L - n`. O(n) time, two passes.
 
 ---
 
 ## Core Observation
 
-Gap of n+1 finds node before target to remove nth-from-end.
+Two pointers with an `n`-node gap. Advance `first` by `n` steps. Then advance both until `first.next == null` — `second` is now at the node just before the target. Bypass the target.
 
 ---
 
 ## Thinking Process
 
-1. Dummy head
-2. Advance fast n+1 steps
-3. Move slow/fast until fast null
-4. slow.next=slow.next.next
-
-**Best understanding:** Fast pointer n steps ahead; move both until fast null; delete slow.next
+1. `first = head`, `second = head`.
+2. Advance `first` by `n` steps.
+3. If `first == null` → the head must be removed → return `head.next`.
+4. While `first.next != null`: advance both `first` and `second`.
+5. `second.next = second.next.next`.
+6. Return `head`.
 
 ---
 
 ## Why the Approach Works
 
-Fixed gap positions slow at predecessor of nth-from-end.
+The `n`-node gap ensures `second` reaches the predecessor of the n-th-from-end node exactly when `first` reaches the last node. The null check on `first` after the gap handles `n == list_length` (removing the head).
 
 ---
 
@@ -44,42 +57,45 @@ Fixed gap positions slow at predecessor of nth-from-end.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | Linked List |
+| Primary | Two pointers with fixed gap |
+| Application | One-pass O(n), no length computation |
 
 ### Pattern Recognition Clues
 
-- Delete nth from end one pass
-- Dummy handles head removal
+- "Find/remove n-th from end in one pass"
+- Maintain exact gap between two pointers
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Linked List](../Linked%20List/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Stack of nodes or length count then second pass.
+Two-pass: compute length, then remove at `length - n`. O(n) same, simpler logic.
 
 ---
 
 ## Critical Implementation Details
 
-- n+1 gap not n
-- Dummy before head
+- Advance `first` exactly `n` times (not `n-1`)
+- `first == null` check after the gap loop handles removal of head (`n == length`)
+- Stop when `first.next == null` (not `first == null`) — `second` must be one step before target
 
 ---
 
 ## Edge Cases
 
-- Remove head n=len
-- Single node
+- Single node (`n = 1`) → return null (first becomes null, return `head.next`)
+- Remove head (`n = list_length`) → handled by the `first == null` check
+- Two-node list, remove last
 
 ---
 
 ## Common Mistakes
 
-- Gap of n off-by-one
-- No dummy on head delete
+- Advancing `first` by `n-1` instead of `n` (off-by-one; `second` ends up at the target, not the predecessor)
+- Not checking `first == null` after the gap (crash when removing head)
+- `while(first != null)` instead of `while(first.next != null)` (overshoots by one)
 
 ---
 
@@ -87,28 +103,29 @@ Stack of nodes or length count then second pass.
 
 | | |
 |--|--|
-| Time | O(n) |
+| Time | O(n) — single pass |
 | Space | O(1) |
 
 ---
 
 ## Similar Problems
 
-- [linked-list-cycle-detection](../linked-list-cycle-detection/README.md)
-- [merge-two-sorted-linked-lists](../merge-two-sorted-linked-lists/README.md)
+- [reverse-linked-list-ii](../reverse-linked-list-ii/README.md) — also uses positioning with offsets
+- [linked-list-cycle-detection](../linked-list-cycle-detection/README.md) — same fast/slow gap idea
 
 ---
 
 ## One-line Takeaway
 
-**Remove nth from end → dummy + n+1 gap pointers.**
+**Gap of n between two pointers; stop when first.next == null; second is the predecessor of target.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] n+1 advance
-- [ ] dummy head
+- [ ] How many steps does `first` advance initially?
+- [ ] What does `first == null` after the gap mean?
+- [ ] Loop condition: `first.next != null` not `first != null`?
 
 ---
 
@@ -116,4 +133,4 @@ Stack of nodes or length count then second pass.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | Documented from `submission-2.java` |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Trees |
 | Difficulty | Easy |
-| Primary Pattern | DFS |
-| Secondary Pattern | BFS |
+| Primary Pattern | DFS post-order swap |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,41 @@
 
 ## Problem Summary
 
-Interview problem `invert-a-binary-tree`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Invert a binary tree (mirror it): every node's left and right children are swapped recursively.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 100`
+- Return the root of the inverted tree
+
+---
+
+## Brute Force
+
+No meaningful brute force here — the recursive approach is both the simplest and optimal.
 
 ---
 
 ## Core Observation
 
-Mirror tree by swapping children at every node.
+To invert a tree: invert the left subtree, invert the right subtree, then swap the left and right children at the current node (post-order).
 
 ---
 
 ## Thinking Process
 
-1. Base null return
-2. Swap root.left and root.right
-3. Recurse inverted subtrees
-4. Return root
-
-**Best understanding:** Swap left/right at each node recursively or queue BFS
+1. Base: `root == null` → return `null`.
+2. Recurse: `invertTree(root.left)`, `invertTree(root.right)`.
+3. Swap: `temp = root.left; root.left = root.right; root.right = temp`.
+4. Return `root`.
 
 ---
 
 ## Why the Approach Works
 
-Local swap at all nodes produces global mirror.
+Post-order ensures both subtrees are fully inverted before the swap at the current node. The swap at every node produces the mirror image of the full tree.
 
 ---
 
@@ -44,42 +55,45 @@ Local swap at all nodes produces global mirror.
 
 | Role | Pattern |
 |------|---------|
-| Primary | DFS |
-| Secondary | BFS |
+| Primary | Post-order DFS — children first, then current node action |
+| Alternative | BFS: process level by level, swapping children as nodes dequeue |
 
 ### Pattern Recognition Clues
 
-- Mirror/invert binary tree
-- Swap children
+- "Mirror / flip a binary tree"
+- Result depends on both subtrees → process children before parent
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Trees](../Trees/README.md) · [PATTERNS.md](../../PATTERNS.md#tree-dfs--aggregate-up)
 
 ---
 
 ## Alternative Approaches
 
-Iterative stack same swaps.
+**BFS:** use a queue; for each node, swap its children and enqueue both. O(n) time, O(w) space.
 
 ---
 
 ## Critical Implementation Details
 
-- Swap before or after recurse both fine
-- Handle null
+- Swap happens **after** recursion (post-order) — but pre-order also works (swap first, then recurse left and right)
+- Null base case is required
+- Must return `root` to preserve the tree reference for the parent
 
 ---
 
 ## Edge Cases
 
-- Empty tree
-- Single node
+- Empty tree → return `null`
+- Single node → unchanged
+- Only left or only right subtree
 
 ---
 
 ## Common Mistakes
 
-- Only swapping root
-- Losing child references
+- Not returning `root` (caller loses reference)
+- Forgetting null base case
+- Thinking pre-order doesn't work (it does — the key is swapping at every node)
 
 ---
 
@@ -88,27 +102,28 @@ Iterative stack same swaps.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(h) |
+| Space | O(h) recursion stack |
 
 ---
 
 ## Similar Problems
 
-- [same-binary-tree](../same-binary-tree/README.md)
-- [depth-of-binary-tree](../depth-of-binary-tree/README.md)
+- [same-binary-tree](../same-binary-tree/README.md) — structural comparison DFS
+- [balanced-binary-tree](../balanced-binary-tree/README.md) — DFS with return value
 
 ---
 
 ## One-line Takeaway
 
-**Invert tree → swap children at every node DFS/BFS.**
+**Recurse both children, then swap left/right at current node — O(n).**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Swap left right
-- [ ] Recurse both
+- [ ] Post-order vs pre-order — does the swap order matter here?
+- [ ] BFS alternative?
+- [ ] Why must we return `root`?
 
 ---
 
@@ -116,4 +131,4 @@ Iterative stack same swaps.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

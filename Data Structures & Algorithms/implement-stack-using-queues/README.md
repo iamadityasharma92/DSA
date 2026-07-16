@@ -1,11 +1,11 @@
-# Implement Stack using Queues
+# Implement Stack Using Queues
 
 | Field | Value |
 |-------|-------|
 | Topic | Stack |
 | Difficulty | Easy |
-| Primary Pattern | Queue |
-| Secondary Pattern | Design |
+| Primary Pattern | Queue rotation on push |
+  Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,45 @@
 
 ## Problem Summary
 
-Interview problem `implement-stack-using-queues`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Implement a LIFO stack using only queue operations (`offer`, `poll`, `peek`, `isEmpty`). Support `push(x)`, `pop()`, `top()`, `empty()`.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ x ≤ 9`
+- At most 100 operations
+- `pop`/`top` only called when stack non-empty
+
+---
+
+## Brute Force
+
+Two queues with full swap on every push — correct but O(n) per push. Single queue rotation is cleaner.
 
 ---
 
 ## Core Observation
 
-Rotate after enqueue makes newest element at dequeue front = stack top.
+After `offer(x)`, rotate the queue by cycling all **previous** elements to the back — moving `x` to the front. Then `poll()` always returns the most recently pushed element (LIFO).
 
 ---
 
 ## Thinking Process
 
-1. push: enqueue then dequeue n-1 times
-2. pop/peek: front of queue
-3. Maintains LIFO order
-4. O(n) push single queue
-
-**Best understanding:** One queue: push then rotate size-1 moves new top to front
+1. `push(x)`:
+   - `q.offer(x)`
+   - Rotate: for `i = q.size() - 1` down to `1`: `q.offer(q.poll())`
+   - Now `x` is at the front.
+2. `pop()` → `q.poll()` (front = most recent = stack top).
+3. `top()` → `q.peek()`.
+4. `empty()` → `q.isEmpty()`.
 
 ---
 
 ## Why the Approach Works
 
-Rotation simulates stack top at queue head.
+After rotation, the queue front always holds the most recently pushed element. `pop` and `top` become O(1). `push` pays O(n) to maintain this invariant — trade-off vs two-queue approach.
 
 ---
 
@@ -44,42 +59,43 @@ Rotation simulates stack top at queue head.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Queue |
-| Secondary | Design |
+| Primary | Queue rotation: rearrange on insert |
+| Contrast | Implement queue with stacks uses lazy transfer; this uses eager rotation |
 
 ### Pattern Recognition Clues
 
-- LIFO using queue ops
-- Single or double queue variants
+- "Implement LIFO using FIFO"
+- Accept O(n) push for O(1) pop/top
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Stack](../Stack/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Two queues—move all but last on push.
+**Two queues (transfer on pop):** push into q1; on pop, move all but last to q2, swap queues. O(n) pop, O(1) push. Symmetric trade-off.
 
 ---
 
 ## Critical Implementation Details
 
-- Rotate size-1 after each push
-- pop uses dequeue
+- Rotation loop count is `q.size() - 1` (not `q.size()`) — the just-added element `x` must NOT be rotated out
+- Single queue sufficient — no second queue needed
+- `top()` is `q.peek()`, not `q.poll()`
 
 ---
 
 ## Edge Cases
 
-- First push
-- pop until empty
+- Single element push then pop
+- Multiple pushes then multiple pops
 
 ---
 
 ## Common Mistakes
 
-- Wrong rotation count
-- Using wrong end as top
+- Rotating `q.size()` times instead of `q.size() - 1` (moves `x` to the back instead of front)
+- Using two queues when one suffices
 
 ---
 
@@ -87,28 +103,28 @@ Two queues—move all but last on push.
 
 | | |
 |--|--|
-| Time | O(n) push O(1) pop |
+| Time | push O(n); pop/top O(1) |
 | Space | O(n) |
 
 ---
 
 ## Similar Problems
 
-- [implement-queue-using-stacks](../implement-queue-using-stacks/README.md)
-- [minimum-stack](../minimum-stack/README.md)
+- [implement-queue-using-stacks](../implement-queue-using-stacks/README.md) — symmetric, O(1) amortized all ops
 
 ---
 
 ## One-line Takeaway
 
-**Stack with one queue → enqueue + rotate n-1.**
+**After each push, rotate queue so newest element is at front — O(n) push, O(1) pop/top.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Rotate after push
-- [ ] pop from front
+- [ ] Rotation count: `size - 1` not `size`?
+- [ ] After rotation, which end holds the latest push?
+- [ ] Compare with lazy-transfer queue implementation?
 
 ---
 
@@ -116,4 +132,4 @@ Two queues—move all but last on push.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

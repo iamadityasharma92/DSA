@@ -1,11 +1,11 @@
-# Top K Elements in List
+# Top K Frequent Elements
 
 | Field | Value |
 |-------|-------|
 | Topic | Heap / Priority Queue |
 | Difficulty | Medium |
-| Primary Pattern | Min Heap |
-| Secondary Pattern | Hashing |
+| Primary Pattern | Frequency count + sort / min-heap |
+| Secondary Pattern | Bucket sort (optimal) |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,54 @@
 
 ## Problem Summary
 
-Interview problem `top-k-elements-in-list`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an integer array and integer `k`, return the `k` most frequent elements. Order of result doesn't matter.
+
+---
+
+## Constraints (typical)
+
+- `k` is always valid (1 ≤ k ≤ distinct element count)
+- Answer is guaranteed unique
+
+---
+
+## Brute Force
+
+Count frequencies, sort by frequency descending, take top k → O(n log n). This is what `submission-1` does.
 
 ---
 
 ## Core Observation
 
-K most frequent tracked by size-k min heap on frequency.
+Three approaches:
+1. **Sort by frequency:** O(n log n). `submission-1`.
+2. **Min-heap of size k:** O(n log k). Maintain k most frequent.
+3. **Bucket sort:** O(n). Frequency buckets — each bucket `i` = list of elements with frequency `i`.
 
 ---
 
 ## Thinking Process
 
-1. HashMap count
-2. Heap push (freq,num)
-3. If size>k pop smallest freq
-4. Drain heap to result
+**`submission-1` (sort):**
+1. Build `HashMap<val, freq>`.
+2. `list = entrySet()`. Sort by `freq` descending.
+3. Return first `k` keys.
 
-**Best understanding:** Count frequencies; min-heap size k on freq; extract k most frequent
+**Min-heap (O(n log k)):**
+1. Build frequency map.
+2. For each entry: add to `minHeap`. If `size > k`: poll (removes least frequent).
+3. Return remaining `k` elements.
+
+**Bucket sort (O(n)):**
+1. Build frequency map.
+2. `buckets[freq]` = list of elements with that frequency.
+3. Scan buckets from high to low, collect until `k` elements gathered.
 
 ---
 
 ## Why the Approach Works
 
-Min heap root is weakest among top k—evict when better freq arrives.
+Min-heap keeps only the k most frequent elements — heap root is always the k-th most frequent (least among top k). Bucket sort: max possible frequency is `n`, so at most `n+1` buckets; linear scan from high to low gathers top k in O(n).
 
 ---
 
@@ -44,42 +68,45 @@ Min heap root is weakest among top k—evict when better freq arrives.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Min Heap |
-| Secondary | Hashing |
+| O(n log n) | Sort by frequency (`submission-1`) |
+| O(n log k) | Min-heap of size k |
+| O(n) | Bucket sort |
 
 ### Pattern Recognition Clues
 
-- K most frequent elements
-- Frequency ranking
+- "Top k by frequency"
+- Space vs time trade-off between approaches
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Heap](../Heap/README.md) · [PATTERNS.md](../../PATTERNS.md#heap--top-k)
 
 ---
 
 ## Alternative Approaches
 
-Bucket sort by frequency O(n).
+**QuickSelect on frequencies:** O(n) expected. Complex to implement.
 
 ---
 
 ## Critical Implementation Details
 
-- Heap compares frequency not value
-- Size k not n
+**Sort approach:** use `(a, b) -> b.getValue() - a.getValue()` for descending sort on entry values.  
+**Min-heap:** `PriorityQueue` by frequency ascending; add all entries, keep size ≤ k by polling.  
+**Bucket:** buckets indexed 1 to n; scan n downto 1; gather from each bucket until k elements.
 
 ---
 
 ## Edge Cases
 
-- k equals distinct count
-- Ties any order often ok
+- `k = 1` → most frequent single element
+- All elements unique → any k elements (all freq = 1)
+- Single element repeated → it's in top k if k ≥ 1
 
 ---
 
 ## Common Mistakes
 
-- Max heap wrong eviction
-- Forgetting freq map
+- `submission-1` handles `k == 1 && n == 1` as a special case unnecessarily — standard code handles it
+- Min-heap: using max-heap gives most frequent at top (must poll all but k) — O(n log n) same as sort
 
 ---
 
@@ -87,28 +114,28 @@ Bucket sort by frequency O(n).
 
 | | |
 |--|--|
-| Time | O(n log k) |
-| Space | O(n) |
+| Time | O(n log n) sort; O(n log k) heap; O(n) bucket |
+| Space | O(n) all approaches |
 
 ---
 
 ## Similar Problems
 
-- [kth-largest-integer-in-a-stream](../kth-largest-integer-in-a-stream/README.md)
-- [majority-element](../majority-element/README.md)
+- [kth-largest-integer-in-a-stream](../kth-largest-integer-in-a-stream/README.md) — same min-heap-of-k pattern
 
 ---
 
 ## One-line Takeaway
 
-**Top k frequent → count + size-k min-heap.**
+**Frequency map → bucket sort O(n) or min-heap O(n log k) for top-k by frequency.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] freq map
-- [ ] min heap k
+- [ ] Three approaches and their complexities?
+- [ ] Min-heap: which direction (min not max)?
+- [ ] Bucket sort: scan which direction (high to low)?
 
 ---
 
@@ -116,4 +143,4 @@ Bucket sort by frequency O(n).
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | `submission-1` uses sort; bucket sort or min-heap preferred in interviews |

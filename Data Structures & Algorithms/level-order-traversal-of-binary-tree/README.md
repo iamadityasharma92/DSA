@@ -1,11 +1,11 @@
-# Level Order Traversal of Binary Tree
+# Binary Tree Level Order Traversal
 
 | Field | Value |
 |-------|-------|
 | Topic | Trees |
 | Difficulty | Medium |
-| Primary Pattern | BFS |
-| Secondary Pattern | Queue |
+| Primary Pattern | BFS level order |
+| Secondary Pattern | Level boundary via queue size snapshot |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,42 @@
 
 ## Problem Summary
 
-Interview problem `level-order-traversal-of-binary-tree`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Return the values of a binary tree's nodes grouped by level: `[[level0], [level1], [level2], …]`.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 2000`
+- Output: list of lists, one per level
+
+---
+
+## Brute Force
+
+DFS with a depth parameter collecting into indexed lists — O(n) time. Valid alternative to BFS.
 
 ---
 
 ## Core Observation
 
-FIFO queue visits nodes layer by layer left to right.
+BFS processes nodes in level order by definition. To separate levels: **snapshot the queue size at the start of each iteration** — process exactly that many nodes before moving to the next level.
 
 ---
 
 ## Thinking Process
 
-1. Enqueue root
-2. While queue: process level count nodes
-3. Poll, add val, enqueue children
-4. Append level to answer
-
-**Best understanding:** Queue BFS; process level size snapshots into result list
+1. `Queue<TreeNode> q = new ArrayDeque<>()`. Add `root` if non-null.
+2. While queue not empty:
+   - `size = q.size()` (frozen level boundary).
+   - Inner loop `i = size` down to 1: poll node, add value to current level list, enqueue non-null children.
+   - Add level list to result if non-empty.
 
 ---
 
 ## Why the Approach Works
 
-Queue ordering naturally groups nodes by depth when level size tracked.
+At the start of each outer iteration, the queue holds exactly the nodes of the current level. Processing `size` nodes before checking again ensures all next-level nodes are enqueued before the inner loop ends.
 
 ---
 
@@ -44,42 +56,46 @@ Queue ordering naturally groups nodes by depth when level size tracked.
 
 | Role | Pattern |
 |------|---------|
-| Primary | BFS |
-| Secondary | Queue |
+| Primary | BFS with level-size snapshot |
+| Alternative | DFS with depth index into result list |
+| Related | Right-side view: last node per level |
 
 ### Pattern Recognition Clues
 
-- Return levels or flat order
-- Tree layer traversal
+- "Level by level", "floor by floor"
+- Group nodes by depth
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Trees](../Trees/README.md) · [PATTERNS.md](../../PATTERNS.md#bfs-level-order)
 
 ---
 
 ## Alternative Approaches
 
-DFS with depth map—less natural.
+**DFS with depth:** `dfs(node, depth, res)` — if `res.size() == depth`, add new list; append `node.val` to `res.get(depth)`. O(n) same complexity, O(h) stack vs O(w) queue.
 
 ---
 
 ## Critical Implementation Details
 
-- Snapshot queue size per level
-- Skip null root
+- Use `ArrayDeque`, not `LinkedList` — `ArrayDeque` does not allow `null` values; must check children before enqueuing
+- Snapshot `q.size()` in `int size = q.size()` before the inner loop; polling changes the queue size
+- Skip adding empty lists (can't happen if root is non-null, but defensive check costs nothing)
 
 ---
 
 ## Edge Cases
 
-- Single node
-- Skewed tree still BFS
+- Empty tree → empty list
+- Single node → `[[val]]`
+- Skewed chain → one node per level
 
 ---
 
 ## Common Mistakes
 
-- Not fixing level boundary
-- Null children enqueued
+- Not snapshotting queue size (using `q.size()` in the loop condition — shrinks as you poll)
+- Enqueuing null children into `ArrayDeque` (throws `NullPointerException`)
+- Using `LinkedList` queue and forgetting about null permissions
 
 ---
 
@@ -88,27 +104,28 @@ DFS with depth map—less natural.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(n) |
+| Space | O(w) — max width of tree in queue |
 
 ---
 
 ## Similar Problems
 
-- [depth-of-binary-tree](../depth-of-binary-tree/README.md)
-- [invert-a-binary-tree](../invert-a-binary-tree/README.md)
+- [binary-tree-right-side-view](../binary-tree-right-side-view/README.md) — BFS last-per-level
+- [depth-of-binary-tree](../depth-of-binary-tree/README.md) — level count as depth
 
 ---
 
 ## One-line Takeaway
 
-**Level order → BFS queue with per-level size loop.**
+**BFS with size snapshot: process exactly q.size() nodes per iteration to isolate each level.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Queue BFS
-- [ ] Level size snapshot
+- [ ] Why snapshot `q.size()` before the inner loop?
+- [ ] Why can't we enqueue null children with `ArrayDeque`?
+- [ ] DFS alternative with depth parameter?
 
 ---
 
@@ -116,4 +133,4 @@ DFS with depth map—less natural.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java` |

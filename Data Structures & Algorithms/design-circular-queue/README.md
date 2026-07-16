@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Design |
 | Difficulty | Medium |
-| Primary Pattern | Array Circular Buffer |
-| Secondary Pattern | Queue |
+| Primary Pattern | Queue design (linked list) |
+| Secondary Pattern | Dummy head sentinel |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `design-circular-queue`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Implement a circular queue with a fixed capacity `k` supporting: `enQueue(val)`, `deQueue()`, `Front()`, `Rear()`, `isEmpty()`, `isFull()` — all in O(1).
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ k ≤ 1000`, values ≥ 0
+- Operations guaranteed valid (won't dequeue empty, won't read front of empty)
+- O(1) per operation
+
+---
+
+## Brute Force
+
+An ArrayList with `add`/`remove(0)` — O(1) append but O(n) front removal. Not acceptable.
 
 ---
 
 ## Core Observation
 
-Wrap indices with modulo; count disambiguates full vs empty when head==tail.
+Track **front (left), rear (right), and free space** explicitly. Linked list nodes give O(1) insert at tail and O(1) remove at head. A dummy head sentinel avoids special-casing the empty state.
 
 ---
 
 ## Thinking Process
 
-1. Array[k], head, tail, count
-2. Enqueue: write tail, tail=(tail+1)%k, count++
-3. Dequeue: read head, head=(head+1)%k, count--
-4. isFull count==k, isEmpty count==0
-
-**Best understanding:** Fixed array, head/tail modulo k, size counter for full/empty
+1. Dummy `left` node; `right = left` (rear starts at dummy).
+2. `enQueue`: if `!isFull()`, create node, append at `right.next`, update `right = newNode`, `space--`.
+3. `deQueue`: if `!isEmpty()`, `left.next = left.next.next`, `space++`. If now empty, reset `right = left`.
+4. `Front()`: `left.next.val`; `Rear()`: `right.val`.
+5. `isEmpty()`: `left.next == null`; `isFull()`: `space == 0`.
 
 ---
 
 ## Why the Approach Works
 
-Circular reuse with O(1) ops; size avoids ambiguous head==tail.
+The dummy avoids null checks on `right` when empty. Tracking `space` separately makes `isFull` O(1) without counting nodes.
 
 ---
 
@@ -44,42 +57,45 @@ Circular reuse with O(1) ops; size avoids ambiguous head==tail.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Array Circular Buffer |
-| Secondary | Queue |
+| Primary | Dummy head linked list with tail pointer |
+| Alternative | Array ring buffer with `%k` indexing |
 
 ### Pattern Recognition Clues
 
-- Bounded queue
-- Wraparound indices
+- Fixed-capacity FIFO API
+- O(1) front dequeue AND rear enqueue required
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Design](../Design/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Linked list with capacity cap.
+**Array ring buffer:** `int[k+1]` with `head`, `tail` pointers and modular arithmetic. O(1) same complexity, O(k) fixed space, no node allocation. Preferred in memory-constrained settings.
 
 ---
 
 ## Critical Implementation Details
 
-- Modulo on advance
-- Count tracks occupancy
+- `isEmpty` checks `left.next == null`, not `space == k`
+- After `deQueue` empties the queue: reset `right = left` so `Rear()` doesn't return stale value
+- `enQueue` handles both "was empty" and "was non-empty" the same — just append at `right.next`
 
 ---
 
 ## Edge Cases
 
-- Enqueue when full false
-- Dequeue empty -1
+- `k = 1` — enqueue then dequeue; ensure `right` resets to `left`
+- Enqueue to a full queue → return false
+- Front/Rear on empty → conventionally `-1`
 
 ---
 
 ## Common Mistakes
 
-- head==tail for both states
-- Modulo off-by-one
+- Forgetting to reset `right` when the queue becomes empty (Rear returns wrong value)
+- Using node count check instead of `space` counter for `isFull`
+- Off-by-one on capacity (accepting `k+1` items instead of `k`)
 
 ---
 
@@ -87,28 +103,30 @@ Linked list with capacity cap.
 
 | | |
 |--|--|
-| Time | O(1) per op |
+| Time | O(1) per operation |
 | Space | O(k) |
 
 ---
 
 ## Similar Problems
 
-- [implement-queue-using-stacks](../implement-queue-using-stacks/README.md)
-- [design-hashmap](../design-hashmap/README.md)
+- [implement-queue-using-stacks](../implement-queue-using-stacks/README.md) — different queue implementation
+- [design-hashmap](../design-hashmap/README.md) — direct-array design
 
 ---
 
 ## One-line Takeaway
 
-**Circular queue = modulo indices + size counter.**
+**Dummy head + tail pointer + space counter gives O(1) circular queue without modular arithmetic.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Mod wrap
-- [ ] Count full/empty
+- [ ] What does the dummy head simplify?
+- [ ] When must `right` be reset to `left`?
+- [ ] `isEmpty` vs `isFull` conditions?
+- [ ] Array ring buffer alternative: how does `%k` work?
 
 ---
 
@@ -116,4 +134,4 @@ Linked list with capacity cap.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

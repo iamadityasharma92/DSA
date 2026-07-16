@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Two Pointers |
 | Difficulty | Easy |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | Greedy |
+| Primary Pattern | Two Pointers + branching palindrome check |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,45 @@
 
 ## Problem Summary
 
-Interview problem `valid-palindrome-ii`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given a string `s`, return `true` if it can be a palindrome after deleting **at most one** character.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ s.length ≤ 5 × 10⁵`
+- Lowercase English letters only
+- At most ONE deletion
+
+---
+
+## Brute Force
+
+Try deleting each character and check if the remaining is a palindrome → O(n²). TLE.
 
 ---
 
 ## Core Observation
 
-At most one deletion—branch into two checks excluding mismatched side.
+Two-pointer palindrome scan. When a mismatch is found at `l` and `r`, try deleting either: check if `s[l+1..r]` or `s[l..r-1]` is a palindrome. Either valid → return `true`.
 
 ---
 
 ## Thinking Process
 
-1. l,r inward compare
-2. If match continue
-3. On mismatch return isPal(l+1,r) or isPal(l,r-1)
-4. Helper linear scan
+1. `l = 0`, `r = n-1`.
+2. While `l < r`:
+   - If `s[l] == s[r]` → `l++`, `r--`.
+   - Else → `return isPalin(s, l+1, r) || isPalin(s, l, r-1)`.
+3. Return `true` (no mismatch → already palindrome).
 
-**Best understanding:** Two pointers; on mismatch try skip left or skip right char; check palindrome once
+**`isPalin(s, l, r)`:** standard two-pointer palindrome check on substring.
 
 ---
 
 ## Why the Approach Works
 
-Only two candidates for single removal at first mismatch.
+When we first encounter a mismatch, we've used 0 deletions. We must delete one of `s[l]` or `s[r]`. Checking both branches covers all possibilities. Beyond the first mismatch, no more deletions allowed — hence a standard palindrome check for each branch.
 
 ---
 
@@ -44,42 +59,45 @@ Only two candidates for single removal at first mismatch.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | Greedy |
+| Primary | Two pointer + try-one-deletion branching |
+| Contrast | is-palindrome has no deletions; this has one |
 
 ### Pattern Recognition Clues
 
-- Delete at most one char
-- Palindrome check
+- "Palindrome with at most k deletions" (here k=1)
+- On first mismatch, try deleting left or right character
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Two Pointers](../Two%20Pointers/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Reverse substring checks—more work.
+Brute force with all deletions — O(n²). DP for k > 1 deletions using longest palindromic subsequence.
 
 ---
 
 ## Critical Implementation Details
 
-- Only one skip allowed total
-- Helper without further skips
+- Only branch on the **first** mismatch — both branches use a helper that allows no further deletions
+- `isPalin` is a clean helper (no class state needed)
+- `return true` at the end (no mismatches → already palindrome, 0 deletions used)
 
 ---
 
 ## Edge Cases
 
-- Already palindrome
-- Mismatch at ends
+- Already a palindrome → return `true` (loop completes without branching)
+- Single character → `true`
+- Two characters: `"ab"` → delete either → `true`
+- "aba" style → palindrome directly
 
 ---
 
 ## Common Mistakes
 
-- Allowing two skips
-- Not branching both sides
+- Allowing a second deletion in `isPalin` (recursion or flag)
+- Forgetting the final `return true` after the while loop
 
 ---
 
@@ -94,21 +112,21 @@ Reverse substring checks—more work.
 
 ## Similar Problems
 
-- [is-palindrome](../is-palindrome/README.md)
-- [reverse-string](../reverse-string/README.md)
+- [is-palindrome](../is-palindrome/README.md) — zero deletions, same two-pointer
 
 ---
 
 ## One-line Takeaway
 
-**Palindrome with one skip → two-pointer branch on mismatch.**
+**Two pointers until mismatch; try deleting left OR right; standard palindrome check for each.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] first mismatch branch
-- [ ] single skip helper
+- [ ] What happens at a mismatch — branch or continue?
+- [ ] Does the `isPalin` helper allow further deletions?
+- [ ] Final `return true` after loop — when does it trigger?
 
 ---
 
@@ -116,4 +134,4 @@ Reverse substring checks—more work.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-1.java` |

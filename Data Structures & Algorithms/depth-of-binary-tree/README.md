@@ -1,11 +1,11 @@
-# Depth of Binary Tree
+# Maximum Depth of Binary Tree
 
 | Field | Value |
 |-------|-------|
 | Topic | Trees |
 | Difficulty | Easy |
-| Primary Pattern | DFS |
-| Secondary Pattern | BFS |
+| Primary Pattern | DFS (post-order height) |
+| Secondary Pattern | BFS level count |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `depth-of-binary-tree`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given the root of a binary tree, return its **maximum depth** — the number of nodes along the longest path from root to a leaf.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 10⁴`
+- Empty tree has depth 0
+- Depth counts **nodes**, not edges (so a single-node tree has depth 1)
+
+---
+
+## Brute Force
+
+No separate brute force — the recursive DFS is both natural and optimal at O(n).
 
 ---
 
 ## Core Observation
 
-Height is one plus the deeper subtree.
+The depth of any node equals `1 + max(depth(left), depth(right))`. A `null` node has depth 0. This gives a clean post-order recursion that visits every node exactly once.
 
 ---
 
 ## Thinking Process
 
-1. Base null → 0
-2. Recurse both children
-3. Return 1 + max
-4. Single node depth 1
+1. Base case: `root == null` → return 0.
+2. Recurse: `leftDepth = depth(root.left)`, `rightDepth = depth(root.right)`.
+3. Return `1 + Math.max(leftDepth, rightDepth)`.
 
-**Best understanding:** return 1 + max(depth(left), depth(right)); null → 0
+`submission-0` uses a helper method `depth()` called from `maxDepth()` — functionally identical to a single recursive method.
 
 ---
 
 ## Why the Approach Works
 
-Longest root-to-leaf path dominates height.
+Post-order: both children are measured before the parent aggregates. The max of two subtree depths picks the longer path; `+1` adds the current node.
 
 ---
 
@@ -44,42 +57,44 @@ Longest root-to-leaf path dominates height.
 
 | Role | Pattern |
 |------|---------|
-| Primary | DFS |
-| Secondary | BFS |
+| Primary | Post-order DFS aggregate up |
+| Alternative | BFS: count levels as queue processes each level |
 
 ### Pattern Recognition Clues
 
-- Maximum depth/height
-- Tree metric
+- "Maximum / minimum depth"
+- Result depends on both subtrees → post-order
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Trees](../Trees/README.md) · [PATTERNS.md](../../PATTERNS.md#tree-dfs--aggregate-up)
 
 ---
 
 ## Alternative Approaches
 
-BFS level count.
+**BFS:** use a queue; increment a counter for each level processed. O(n), O(w) space. Good when depth coincides with BFS use anyway.
 
 ---
 
 ## Critical Implementation Details
 
-- +1 per node level
-- Null before recurse
+- Null returns 0 (not -1 or -∞)
+- A leaf returns 1 (null children both return 0, so `1 + max(0,0) = 1`)
+- Depth = node count along path, not edge count
 
 ---
 
 ## Edge Cases
 
-- Empty tree
-- Skewed chain depth n
+- Empty tree → 0
+- Single node → 1
+- Completely skewed chain → O(n) depth
 
 ---
 
 ## Common Mistakes
 
-- Count edges not nodes
-- Missing +1
+- Returning 0 for a leaf (off-by-one in node vs edge count)
+- Mixing depth (node count) and height (edge count) problems
 
 ---
 
@@ -87,28 +102,30 @@ BFS level count.
 
 | | |
 |--|--|
-| Time | O(n) |
-| Space | O(h) |
+| Time | O(n) — every node visited once |
+| Space | O(h) recursion stack |
 
 ---
 
 ## Similar Problems
 
-- [same-binary-tree](../same-binary-tree/README.md)
-- [invert-a-binary-tree](../invert-a-binary-tree/README.md)
+- [balanced-binary-tree](../balanced-binary-tree/README.md) — same height DFS, adds `|L−R|` check
+- [binary-tree-diameter](../binary-tree-diameter/README.md) — uses `L + R` instead of `max(L, R)`
 
 ---
 
 ## One-line Takeaway
 
-**Tree depth = 1 + max(left,right), base null=0.**
+**depth(node) = 1 + max(depth(left), depth(right)); null → 0.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Null returns 0
-- [ ] +1 each node
+- [ ] Return value for null node?
+- [ ] Return value for a leaf?
+- [ ] Node-count vs edge-count distinction?
+- [ ] When to prefer BFS alternative?
 
 ---
 
@@ -116,4 +133,4 @@ BFS level count.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

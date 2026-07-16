@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Bit Manipulation |
 | Difficulty | Easy |
-| Primary Pattern | Dynamic Programming |
-| Secondary Pattern | Bit Manipulation |
+| Primary Pattern | Bit Manipulation |
+| Secondary Pattern | DP (optimal upgrade) |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,46 @@
 
 ## Problem Summary
 
-Interview problem `counting-bits`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an integer `n`, return an array `ans` of length `n + 1` where `ans[i]` is the number of `1` bits in `i` (its "popcount").
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ n ≤ 10⁵`
+- Output: `ans[0..n]` inclusive
+
+---
+
+## Brute Force
+
+`Integer.bitCount(i)` for each `i` — O(log i) per call → O(n log n) total. This is what `submission-0` does. Accepted but not the intended O(n) DP.
 
 ---
 
 ## Core Observation
 
-Popcount of i equals popcount of i/2 plus its least significant bit.
+Every number `i` shares all bits with `i >> 1` (right-shift drops the LSB) plus the LSB itself:
+`popcount(i) = popcount(i >> 1) + (i & 1)`
+
+This is a one-line DP that builds the array left to right in O(n).
 
 ---
 
 ## Thinking Process
 
-1. dp[0]=0
-2. For i=1..n: dp[i]=dp[i>>1]+(i&1)
-3. Return dp
-4. Avoid per-number loop to n log n
+1. `res = new int[n+1]`
+2. `res[0] = 0` (base)
+3. For `i = 1..n`: `res[i] = res[i >> 1] + (i & 1)`
+4. Return `res`
 
-**Best understanding:** dp[i] = dp[i>>1] + (i&1)
+`submission-0` uses `Integer.bitCount` per index — correct but misses the DP insight expected in interviews.
 
 ---
 
 ## Why the Approach Works
 
-Right shift removes LSB; i&1 tells if it was set.
+`i >> 1` is a previously computed index (`< i`), so the DP recurrence has no cycles. The LSB is either 0 (even) or 1 (odd), directly readable with `i & 1`.
 
 ---
 
@@ -44,42 +60,48 @@ Right shift removes LSB; i&1 tells if it was set.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Dynamic Programming |
-| Secondary | Bit Manipulation |
+| Primary | Bit manipulation recurrence |
+| Alternative | Brian Kernighan loop per element |
+| Contrast | `Integer.bitCount` is O(log i) per call |
 
 ### Pattern Recognition Clues
 
-- Popcount for every 0..n
-- Batch not per-number brute
+- "Count 1-bits for all numbers 0..n"
+- Pattern in popcount across consecutive integers
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Bit Manipulation](../Bit%20Manipulation/README.md) · [PATTERNS.md](../../PATTERNS.md#bit-tricks)
 
 ---
 
 ## Alternative Approaches
 
-Brian Kernighan per i—slower.
+**Brian Kernighan per element:** `while(n) { n &= n-1; count++; }` — O(k) per number. Still O(n log n) overall.
+
+**DP with lowest set bit:** `res[i] = res[i & (i-1)] + 1` — same O(n), slightly different phrasing.
 
 ---
 
 ## Critical Implementation Details
 
-- Use i>>1 not i-1
-- Inclusive 0..n
+- Array size is `n + 1` (indices 0 through n inclusive)
+- `res[0] = 0` is the base case; loop starts at `i = 1`
+- `res[i >> 1]` is always already computed when processing `i`
+- `(i & 1)` extracts the LSB (0 or 1)
 
 ---
 
 ## Edge Cases
 
-- n=0
-- Powers of two → 1
+- `n = 0` → `[0]`
+- `n = 1` → `[0, 1]`
 
 ---
 
 ## Common Mistakes
 
-- Wrong recurrence
-- Off-by-one range
+- Off-by-one: array size `n` instead of `n+1`
+- Using `bitCount` per element (correct but weaker interview answer)
+- `res[i/2]` instead of `res[i >> 1]` (same thing, but `>>` makes the bit relationship explicit)
 
 ---
 
@@ -87,28 +109,30 @@ Brian Kernighan per i—slower.
 
 | | |
 |--|--|
-| Time | O(n) |
-| Space | O(n) |
+| Time | O(n) with DP; O(n log n) with bitCount |
+| Space | O(1) extra beyond output |
 
 ---
 
 ## Similar Problems
 
-- [number-of-one-bits](../number-of-one-bits/README.md)
-- [single-number](../single-number/README.md)
+- [number-of-one-bits](../number-of-one-bits/README.md) — single integer popcount
+- [single-number](../single-number/README.md) — XOR bit trick
 
 ---
 
 ## One-line Takeaway
 
-**dp[i]=dp[i>>1]+(i&1) is the popcount DP to memorize.**
+**`res[i] = res[i >> 1] + (i & 1)` — inherit parent's popcount, add LSB.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Shift recurrence
-- [ ] Base dp[0]=0
+- [ ] State the DP recurrence from memory
+- [ ] Why is `res[i >> 1]` always available?
+- [ ] What does `i & 1` compute?
+- [ ] Contrast with `Integer.bitCount` approach
 
 ---
 
@@ -116,4 +140,4 @@ Brian Kernighan per i—slower.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0` (bitCount); note DP upgrade for interviews |

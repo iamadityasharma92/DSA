@@ -3,9 +3,9 @@
 | Field | Value |
 |-------|-------|
 | Topic | Binary Search |
-| Difficulty | Medium |
+| Difficulty | Hard |
 | Primary Pattern | Binary Search on Answer |
-| Secondary Pattern | Greedy |
+| Secondary Pattern | Greedy feasibility check |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,42 @@
 
 ## Problem Summary
 
-Interview problem `split-array-largest-sum`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Split an array into exactly `k` non-empty contiguous subarrays to minimize the largest subarray sum. Return that minimum value.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ k ≤ nums.length ≤ 1000`
+- `0 ≤ nums[i] ≤ 10⁶`
+
+---
+
+## Brute Force
+
+Try all ways to split into `k` subarrays → O(n^k). Infeasible.
 
 ---
 
 ## Core Observation
 
-Minimize largest partition sum—monotonic feasibility on answer.
+The answer is monotone: if we can split with max sum ≤ `m`, we can also do it with max sum ≤ `m+1`. Binary search on `m` in `[max(nums), sum(nums)]`.
 
 ---
 
 ## Thinking Process
 
-1. lo=max(nums), hi=sum
-2. Mid max sum → greedy split count
-3. If splits≤k feasible shrink hi
-4. Return best res
-
-**Best understanding:** BS on max subarray sum; canSplit greedily counts parts ≤ k
+1. `l = max(nums)`, `r = sum(nums)`.
+2. While `l <= r`: `m = l + (r-l)/2`.
+3. `canSplit(nums, m, k)`: greedily partition — accumulate sum; when `sum > m`, start new partition (`c++`, `sum = nums[i]`). Return `c <= k`.
+4. If feasible: `res = m`, `r = m-1`; else `l = m+1`.
+5. Return `res`.
 
 ---
 
 ## Why the Approach Works
 
-Same BS+greedy partition template as ship packages.
+The lower bound `max(nums)` ensures each element fits in at least one partition. Upper bound `sum` is all one partition. The greedy check counts minimum partitions needed for max sum ≤ `m` — if that count ≤ `k`, it's feasible.
 
 ---
 
@@ -45,41 +57,45 @@ Same BS+greedy partition template as ship packages.
 | Role | Pattern |
 |------|---------|
 | Primary | Binary Search on Answer |
-| Secondary | Greedy |
+| Check | Greedy: minimize partition count for given max |
+| Same family | eating-bananas, capacity-to-ship |
 
 ### Pattern Recognition Clues
 
-- Split into k subarrays minimize max sum
-- Contiguous partitions
+- "Minimize the maximum" of subarrays
+- Monotone feasibility on the answer value
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Binary Search](../Binary%20Search/README.md) · [PATTERNS.md](../../PATTERNS.md#binary-search-on-answer)
 
 ---
 
 ## Alternative Approaches
 
-DP O(n²k)—heavier.
+DP: `dp[i][j]` = min largest sum to split `nums[0..i]` into `j` parts → O(n² × k). Binary search is O(n log(sum)).
 
 ---
 
 ## Critical Implementation Details
 
-- Greedy start new part when sum>m
-- Track parts count
+- `l = max(nums)` not 0 or 1 — each element must fit in its partition
+- In `canSplit`: `sum = nums[i]` (not 0) when starting new partition — the overflowing element goes to the new partition
+- Return `res` (last feasible `m`), not `l` (may be infeasible)
 
 ---
 
 ## Edge Cases
 
-- k=1 whole array
-- k=n each element
+- `k = 1` → answer is `sum(nums)`
+- `k = n` → answer is `max(nums)`
+- `nums.length < k` → impossible (submission handles with `return -1`)
 
 ---
 
 ## Common Mistakes
 
-- Allowing non-contiguous groups
-- Wrong BS direction
+- Lower bound 0 or 1 (elements don't fit)
+- `sum = 0` instead of `sum = nums[i]` when starting new partition (element is missed)
+- Checking `c > k` too late (should return false immediately)
 
 ---
 
@@ -87,28 +103,29 @@ DP O(n²k)—heavier.
 
 | | |
 |--|--|
-| Time | O(n log S) |
+| Time | O(n log(sum)) |
 | Space | O(1) |
 
 ---
 
 ## Similar Problems
 
-- [capacity-to-ship-packages-within-d-days](../capacity-to-ship-packages-within-d-days/README.md)
-- [eating-bananas](../eating-bananas/README.md)
+- [capacity-to-ship-packages-within-d-days](../capacity-to-ship-packages-within-d-days/README.md) — identical skeleton
+- [eating-bananas](../eating-bananas/README.md) — same BS-on-answer template
 
 ---
 
 ## One-line Takeaway
 
-**Min max partition sum → BS answer + greedy split count.**
+**BS in [max, sum]; greedy count partitions for mid; feasible → try smaller; infeasible → try larger.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] canSplit greedy
-- [ ] BS bounds max..sum
+- [ ] Lower bound `max(nums)`, not 1?
+- [ ] `canSplit`: when starting new partition, `sum = nums[i]` not 0?
+- [ ] Return `res` (last valid `m`) vs return `l`?
 
 ---
 
@@ -116,4 +133,4 @@ DP O(n²k)—heavier.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Arrays & Hashing |
 | Difficulty | Easy |
-| Primary Pattern | Array Traversal |
-| Secondary Pattern | Simulation |
+| Primary Pattern | Array construction |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,42 @@
 
 ## Problem Summary
 
-Interview problem `concatenation-of-array`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an integer array `nums` of length `n`, return a new array of length `2n` that is `nums` followed by `nums` (i.e. `[nums, nums]`).
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ n ≤ 1000`, values fit in int
+- Output is exactly length `2n`
+
+---
+
+## Brute Force
+
+No complexity issue here — the naive approach IS the optimal approach.
 
 ---
 
 ## Core Observation
 
-Concatenation duplicates the full array back-to-back.
+Each element `nums[i]` belongs at both index `i` and index `i + n` in the output.
 
 ---
 
 ## Thinking Process
 
-1. Allocate ans[2n]
-2. Copy nums to indices 0..n-1
-3. Copy nums to indices n..2n-1
-4. Return ans
+1. Allocate `int[2*n]`.
+2. For each `i` in `[0, n)`: set `res[i] = res[i+n] = nums[i]`.
+3. Return `res`.
 
-**Best understanding:** Result length 2n; copy nums twice into ans
+`submission-1` is the cleanest: `res[i+n] = res[i] = nums[i]` in one assignment per loop iteration.
 
 ---
 
 ## Why the Approach Works
 
-Definition requires identical sequence twice in order.
+Direct index mapping — no sorting, shifting, or extra structures needed.
 
 ---
 
@@ -44,42 +56,42 @@ Definition requires identical sequence twice in order.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Array Traversal |
-| Secondary | Simulation |
+| Primary | Direct index mapping |
+| Contrast | This is simpler than rotate-array which reverses in-place |
 
 ### Pattern Recognition Clues
 
-- Output length 2n
-- Same order repeated
-
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+- Output is a simple structural repeat of input
+- Output length is a fixed multiple of input length
 
 ---
 
 ## Alternative Approaches
 
-Append nums to itself via list—same O(n).
+`System.arraycopy` twice — same O(n), more idiomatic Java.
 
 ---
 
 ## Critical Implementation Details
 
-- Preserve order
-- Size exactly 2n
+- Output array is length `2 * n`, NOT `n + 1`
+- Both halves can be filled in a single loop pass
+- No modular arithmetic needed — just `i` and `i + n`
 
 ---
 
 ## Edge Cases
 
-- n = 1
-- Large n still linear
+- `n = 1` → `[x, x]`
+- All same values
+- Negative numbers (handled naturally)
 
 ---
 
 ## Common Mistakes
 
-- Index off-by-one
-- Mutating input only
+- Allocating array of size `n` instead of `2n`
+- Using two separate loops instead of one
 
 ---
 
@@ -88,27 +100,27 @@ Append nums to itself via list—same O(n).
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(n) |
+| Space | O(n) — output only |
 
 ---
 
 ## Similar Problems
 
-- [merge-strings-alternately](../merge-strings-alternately/README.md)
-- [merge-sorted-array](../merge-sorted-array/README.md)
+- [rotate-array](../rotate-array/README.md) — more complex in-place manipulation
+- [merge-sorted-array](../merge-sorted-array/README.md) — fills an array using two sources
 
 ---
 
 ## One-line Takeaway
 
-**Warm-up copy—confirm indexing before harder array work.**
+**`res[i] = res[i+n] = nums[i]` — one pass, two writes.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] 2n output
-- [ ] Two identical passes
+- [ ] Output array size?
+- [ ] Single-pass or two-pass?
 
 ---
 
@@ -116,4 +128,4 @@ Append nums to itself via list—same O(n).
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | Documented from `submission-0` / `submission-1` (identical logic) |

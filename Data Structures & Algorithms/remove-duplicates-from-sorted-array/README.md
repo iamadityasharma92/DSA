@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Two Pointers |
 | Difficulty | Easy |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | Array |
+| Primary Pattern | Two Pointers (slow-fast in-place dedup) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `remove-duplicates-from-sorted-array`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given a sorted array, remove duplicates **in-place** so each element appears only once. Return the count of unique elements `k`. The first `k` elements of the array should contain the unique values in order.
+
+---
+
+## Constraints (typical)
+
+- Sorted ascending
+- In-place (O(1) extra space)
+- Values beyond `k` in the array don't matter
+
+---
+
+## Brute Force
+
+Copy unique values to a separate array → O(n) but O(n) extra space. Violates in-place constraint.
 
 ---
 
 ## Core Observation
 
-Sorted duplicates group together—compare to last written unique.
+Two pointers: `l` marks the "write position" (last unique element written); `r` scans right. When `nums[r] != nums[l]`, write `nums[r]` to `nums[l+1]`.
 
 ---
 
 ## Thinking Process
 
-1. write=1
-2. i from 1: if nums[i]!=nums[write-1] nums[write++]=nums[i]
-3. Return write
-4. In-place overwrite front
-
-**Best understanding:** write pointer places nums[i] if nums[i]!=nums[write-1]; return write
+1. `l = r = 0`.
+2. While `r < n`:
+   - If `nums[l] == nums[r]` → `r++` (skip duplicate).
+   - Else → `nums[++l] = nums[r++]` (write next unique, advance both).
+3. Return `++l` (1-based count = position of last unique + 1).
 
 ---
 
 ## Why the Approach Works
 
-Sorted order lets O(n) unique compaction without extra space.
+Because the array is sorted, duplicates are contiguous. `l` only advances when a new distinct value is found. The final value of `l+1` equals the count of unique elements.
 
 ---
 
@@ -44,42 +57,45 @@ Sorted order lets O(n) unique compaction without extra space.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | Array |
+| Primary | Slow-fast two pointer for in-place dedup in sorted array |
+| Contrast | remove-element removes a specific value; this removes all duplicates |
 
 ### Pattern Recognition Clues
 
-- Sorted array unique prefix
-- Return k not full array
+- "Remove duplicates in sorted array, in-place"
+- Slow pointer = write head; fast pointer = read head
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Two Pointers](../Two%20Pointers/README.md)
 
 ---
 
 ## Alternative Approaches
 
-HashSet—breaks order.
+Collect all unique values into a list then copy back — O(n) time but O(n) space.
 
 ---
 
 ## Critical Implementation Details
 
-- Compare to write-1 not i-1 always
-- write starts 1 if non-empty
+- `++l` (pre-increment) writes to the next slot before the assignment
+- Return `++l` (pre-increment again) — converts 0-based `l` to 1-based count
+- Both pointers start at 0; `r` leads
 
 ---
 
 ## Edge Cases
 
-- Empty length 0
-- All unique write=n
+- `n == 1` → return 1 immediately
+- All same elements → return 1
+- All unique → return n
 
 ---
 
 ## Common Mistakes
 
-- Using set on sorted
-- Wrong compare index
+- Post-increment `l++` instead of pre-increment `++l` (writes to wrong slot)
+- Off-by-one: `return l` vs `return l+1` (missing the 1-based count conversion)
+- Not handling `n == 1` (both pointers at 0, loop runs but `l` never advances, `++l` at return = 1 ✓)
 
 ---
 
@@ -94,21 +110,22 @@ HashSet—breaks order.
 
 ## Similar Problems
 
-- [remove-element](../remove-element/README.md)
-- [merge-sorted-array](../merge-sorted-array/README.md)
+- [remove-element](../remove-element/README.md) — remove specific value in-place
+- [sort-colors](../sort-colors/README.md) — in-place partitioning
 
 ---
 
 ## One-line Takeaway
 
-**Sorted dedup → write pointer vs last placed.**
+**Sorted array: `r` scans, `l` writes; on new value `nums[++l] = nums[r++]`; return `++l`.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] write pointer
-- [ ] compare write-1
+- [ ] Why pre-increment `++l` not post-increment `l++`?
+- [ ] Return `++l` vs `l` — why?
+- [ ] What does `l` represent at end of loop?
 
 ---
 
@@ -116,4 +133,4 @@ HashSet—breaks order.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

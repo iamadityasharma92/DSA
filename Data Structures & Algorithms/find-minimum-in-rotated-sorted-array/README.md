@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Binary Search |
 | Difficulty | Medium |
-| Primary Pattern | Binary Search |
-| Secondary Pattern | Rotated Array |
+| Primary Pattern | Binary Search on rotated sorted array |
+| Secondary Pattern | Running minimum tracking |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,49 @@
 
 ## Problem Summary
 
-Interview problem `find-minimum-in-rotated-sorted-array`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+A sorted array was rotated at an unknown pivot. Find the minimum element in O(log n).
+
+---
+
+## Constraints (typical)
+
+- All values unique
+- `1 ≤ n ≤ 5000`
+- Must be O(log n)
+
+---
+
+## Brute Force
+
+`submission-0`: linear scan tracking min → O(n). Correct but too slow.
 
 ---
 
 ## Core Observation
 
-Rotation breaks order at one pivot—smaller half contains minimum.
+At any mid point, one of the two halves is **sorted**. The minimum is in the unsorted half (where the rotation pivot is). Compare `nums[mid]` with `nums[r]`:
+
+- `nums[mid] < nums[r]` → right half is sorted; minimum could be `mid` but is NOT to the right of `mid` → `r = mid - 1`
+- else → rotation/pivot is in or right of `mid`; minimum is right of `mid` → `l = mid + 1`
+
+Track `mini` throughout since the minimum could be `nums[mid]` itself at any point.
 
 ---
 
 ## Thinking Process
 
-1. l=0,r=n-1
-2. If nums[mid]>nums[r] l=mid+1
-3. Else r=mid
-4. nums[l] is minimum
-
-**Best understanding:** BS: if nums[mid]>nums[r] min in right else min in left incl mid
+1. `l = 0`, `r = n-1`, `mini = INT_MAX`.
+2. While `l <= r`: `m = l + (r-l)/2`.
+3. `mini = min(mini, nums[m])`.
+4. If `nums[m] < nums[r]` → `r = m - 1` (search left half including m).
+5. Else → `l = m + 1` (minimum is right).
+6. Return `mini`.
 
 ---
 
 ## Why the Approach Works
 
-Mid greater than right means min strictly right of mid.
+By comparing `nums[mid]` to `nums[r]` (not `nums[l]`), we reliably identify which half is sorted. The minimum must be in the other half. Tracking `mini` handles the case where `mid` itself is the minimum.
 
 ---
 
@@ -44,42 +63,44 @@ Mid greater than right means min strictly right of mid.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Binary Search |
-| Secondary | Rotated Array |
+| Primary | BS: compare mid to boundary to determine sorted half |
+| Contrast | Find target in rotated array adds a target range check |
 
 ### Pattern Recognition Clues
 
-- Rotated sorted unique
-- Find min not target
+- "Find minimum in rotated sorted array"
+- Cannot use standard BS; need to reason about sorted halves
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Binary Search](../Binary%20Search/README.md) · [PATTERNS.md](../../PATTERNS.md#binary-search-templates)
 
 ---
 
 ## Alternative Approaches
 
-Find pivot index linearly.
+Linear scan O(n) — always finds min but doesn't meet the O(log n) requirement.
 
 ---
 
 ## Critical Implementation Details
 
-- Compare mid to r not l
-- r=mid not mid-1
+- Compare `nums[mid]` to `nums[r]`, **not** `nums[l]` — comparing to `nums[l]` can mislead when array isn't rotated
+- Always update `mini = min(mini, nums[mid])` before shrinking — don't rely on final `l`/`r` alone
+- Use `l <= r` (inclusive bounds, `mid` checked on every iteration)
 
 ---
 
 ## Edge Cases
 
-- No rotation sorted
-- Two elements
+- Not rotated (already sorted) → min is `nums[0]`
+- Rotated once → one large segment + one small segment
+- Two-element array
 
 ---
 
 ## Common Mistakes
 
-- Compare to left incorrectly
-- Returning mid too early
+- Comparing `nums[mid]` to `nums[l]` instead of `nums[r]` (breaks when array is not rotated)
+- Not tracking running `mini` and relying only on final pointer position
 
 ---
 
@@ -94,21 +115,22 @@ Find pivot index linearly.
 
 ## Similar Problems
 
-- [find-target-in-rotated-sorted-array](../find-target-in-rotated-sorted-array/README.md)
-- [search-in-rotated-sorted-array-ii](../search-in-rotated-sorted-array-ii/README.md)
+- [find-target-in-rotated-sorted-array](../find-target-in-rotated-sorted-array/README.md) — same sorted-half logic + target range check
+- [binary-search](../binary-search/README.md) — unrotated foundation
 
 ---
 
 ## One-line Takeaway
 
-**Rotated min → BS compare nums[mid] vs nums[r].**
+**Compare mid to right boundary; if sorted right→search left, else search right; track running min.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] mid vs right
-- [ ] r=mid shrink
+- [ ] Compare `nums[mid]` to `nums[r]` — not `nums[l]`?
+- [ ] When does `r = mid - 1` and when `l = mid + 1`?
+- [ ] Why track `mini` rather than just return `nums[l]`?
 
 ---
 
@@ -116,4 +138,4 @@ Find pivot index linearly.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-1 |
+| — | `submission-0` (brute) → `submission-1` (binary search, optimal) |

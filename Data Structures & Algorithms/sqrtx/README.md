@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Binary Search |
 | Difficulty | Easy |
-| Primary Pattern | Binary Search |
-| Secondary Pattern | Math |
+| Primary Pattern | Binary Search on answer (integer square root) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,45 @@
 
 ## Problem Summary
 
-Interview problem `sqrtx`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given a non-negative integer `x`, return the integer square root (floor of the actual sqrt). Do not use built-in `sqrt`.
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ x ≤ 2³¹ - 1`
+- Return floor of `sqrt(x)` — largest integer `r` where `r² ≤ x`
+
+---
+
+## Brute Force
+
+Linear scan from 1 upward until `i² > x` → O(√x). Too slow for large `x`.
 
 ---
 
 ## Core Observation
 
-Integer sqrt is monotonic predicate on mid—classic answer BS.
+Binary search for the largest `m` where `m² ≤ x`. Search space `[0, x]` with early exit on exact square.
 
 ---
 
 ## Thinking Process
 
-1. l=0,r=x
-2. mid*mid vs x
-3. If <=x store ans l=mid+1 else r=mid-1
-4. Return floor sqrt
-
-**Best understanding:** BS on answer 0..x; largest mid with mid*mid<=x
+1. Handle `x = 0` and `x = 1` (return same).
+2. `l = 0`, `r = x` (`long` to prevent overflow when `r = 2³¹ - 1`).
+3. While `l < r`: `m = l + (r-l)/2`.
+4. `sqr = m * m`.
+5. `sqr == x` → return `m`.
+6. `sqr > x` → `r = m` (try smaller).
+7. `sqr < x` → `l = m + 1`.
+8. Return `l - 1` (`l` is the first integer where `l² > x`; `l-1` is the floor sqrt).
 
 ---
 
 ## Why the Approach Works
 
-Sqrt function monotonic enables binary search for floor value.
+The feasibility of `m² ≤ x` is monotone — true for `m = 0..⌊√x⌋`, false beyond. Binary search finds the boundary. At exit, `l` is the first position where `l² > x`, so floor sqrt = `l - 1`.
 
 ---
 
@@ -44,42 +59,46 @@ Sqrt function monotonic enables binary search for floor value.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Binary Search |
-| Secondary | Math |
+| Primary | BS on integer value (find largest `m` with `m² ≤ x`) |
+| Template | Half-open `[l, r)` with `r = m` on overshoot |
 
 ### Pattern Recognition Clues
 
-- Integer square root
-- No floating sqrt
+- "Integer sqrt without built-in"
+- Find largest value satisfying a quadratic monotone condition
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Binary Search](../Binary%20Search/README.md) · [PATTERNS.md](../../PATTERNS.md#binary-search-on-answer)
 
 ---
 
 ## Alternative Approaches
 
-Newton iteration.
+Newton's method: `x_new = (x + n/x) / 2` — converges quadratically. O(log log x) iterations. More complex but faster.
 
 ---
 
 ## Critical Implementation Details
 
-- Use long for mid*mid overflow
-- Floor not ceil
+- Use `long` for `l`, `r`, `m`, and `m*m` — `x` can be `2³¹-1`; `m*m` can overflow `int`
+- Return `l - 1` not `l` when using this template (halfopen, `l` overshoots by 1)
+- Base cases `x = 0` → 0, `x = 1` → 1 (submission handles explicitly)
 
 ---
 
 ## Edge Cases
 
-- x=0
-- Perfect squares
+- `x = 0` → 0
+- `x = 1` → 1
+- Perfect square (e.g., `x = 4`) → caught by `sqr == x` early return
+- `x = INT_MAX` → `r` must be `long`
 
 ---
 
 ## Common Mistakes
 
-- mid*mid int overflow
-- Returning hi not ans
+- Using `int` for `m * m` → overflow for large `x`
+- Returning `l` instead of `l - 1` (when not using early-return for perfect squares)
+- `r = x` in int → overflow before the long cast
 
 ---
 
@@ -94,21 +113,22 @@ Newton iteration.
 
 ## Similar Problems
 
-- [guess-number-higher-or-lower](../guess-number-higher-or-lower/README.md)
-- [search-insert-position](../search-insert-position/README.md)
+- [search-insert-position](../search-insert-position/README.md) — same lower-bound BS pattern
+- [guess-number-higher-or-lower](../guess-number-higher-or-lower/README.md) — same BS template with external oracle
 
 ---
 
 ## One-line Takeaway
 
-**Integer sqrt → BS on mid with mid*mid<=x.**
+**BS `[0, x]` with `long`; `r = m` on overshoot; return `l - 1` (first where `l² > x`).**
 
 ---
 
 ## Revision Checklist
 
-- [ ] overflow safe multiply
-- [ ] floor answer
+- [ ] Why `long` for bounds and product?
+- [ ] Return `l - 1` not `l`?
+- [ ] What does the exit condition `l == r` mean here?
 
 ---
 
@@ -116,4 +136,4 @@ Newton iteration.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | Documented from `submission-2.java` |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Arrays & Hashing |
 | Difficulty | Hard |
-| Primary Pattern | Index as Hash |
-| Secondary Pattern | Array |
+| Primary Pattern | Index-as-hash (presence marking) |
+| Secondary Pattern | HashSet lookup |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,44 @@
 
 ## Problem Summary
 
-Interview problem `first-missing-positive`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given an unsorted integer array, return the smallest **positive** integer not present in the array. Must run in O(n) and O(1) extra space (ideally).
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ n ≤ 10⁵`
+- Values can be any integer (negative, zero, large positive)
+- Answer is always in `[1, n+1]`
+
+---
+
+## Brute Force
+
+`submission-0`: HashSet of all elements, then scan `1, 2, 3, …` → O(n) time but O(n) space.
 
 ---
 
 ## Core Observation
 
-Answer lies in [1,n+1]; only values 1..n matter for marking.
+The answer must be in `[1, n+1]`. Values outside `[1, n]` are irrelevant. Use a `boolean[n]` to mark which values in `[1, n]` are present; first `false` gives the answer. Return `n+1` if all are present.
+
+`submission-3` (best): boolean array of size `n`, mark `num-1 = true` for valid nums, scan for first false.
 
 ---
 
 ## Thinking Process
 
-1. Ignore non-positive and >n
-2. Mark seen i at index i-1
-3. Scan for first unmarked → i+1
-4. All marked → n+1
-
-**Best understanding:** Boolean/mark presence for values in [1,n]; scan for first missing
+1. `bool = new boolean[n]`.
+2. For each `num`: if `1 <= num <= n` → `bool[num-1] = true`.
+3. For `i = 0..n-1`: if `!bool[i]` → return `i+1`.
+4. Return `n+1`.
 
 ---
 
 ## Why the Approach Works
 
-Pigeonhole: missing positive must be in 1..n+1; in-place marks O(1) space.
+Any value outside `[1, n]` cannot be the first missing positive (which is in `[1, n+1]`). The boolean array maps position `i` to presence of value `i+1` in O(1) per lookup. Worst case answer is `n+1` (all 1..n present).
 
 ---
 
@@ -44,42 +58,46 @@ Pigeonhole: missing positive must be in 1..n+1; in-place marks O(1) space.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Index as Hash |
-| Secondary | Array |
+| Primary | Boolean array index = value−1 (presence marking) |
+| Optimal upgrade | In-place negation on original array (O(1) space, mutates) |
 
 ### Pattern Recognition Clues
 
-- O(1) extra space
-- Unsorted integers
+- "First missing positive"
+- Answer bounded in [1, n+1] — only n slots to check
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Arrays & Hashing](../Arrays%20%26%20Hashing/README.md) · [PATTERNS.md](../../PATTERNS.md#hashing--canonical-keys)
 
 ---
 
 ## Alternative Approaches
 
-HashSet of positives—O(n) space.
+**O(1) space in-place:** repurpose original array as presence map via negation. For each value `v` in `[1, n]`, set `nums[v-1]` negative. Then scan for first non-negative index. Same O(n) time, O(1) space, but modifies array.
 
 ---
 
 ## Critical Implementation Details
 
-- Only mark 1..n range
-- Preserve sign or use swap-to-place
+- Only mark `num` if `1 <= num <= n` — negative values and 0 must be skipped
+- `bool[num-1]` maps value `num` to index `num-1` (0-based)
+- Return `n+1` if no false found (all 1..n present)
+- `submission-2` over-allocates `bool[100001]` — wastes memory; `submission-3` uses tight size `n`
 
 ---
 
 ## Edge Cases
 
-- All negatives → 1
-- Permutation 1..n → n+1
+- All negative → answer is 1
+- Array `[1, 2, 3]` → answer is 4 (`n+1`)
+- Array `[2]` → answer is 1
 
 ---
 
 ## Common Mistakes
 
-- Using O(n) HashSet when space constrained
-- Marking wrong indices
+- Not filtering values outside `[1, n]` (index out of bounds)
+- Returning wrong default (must return `n+1` not `n` or `maxi+1` arbitrarily)
+- `submission-0` bug: `return maxi > 0 ? maxi+1 : 1` — wrong when maxi is large and gaps exist
 
 ---
 
@@ -88,27 +106,29 @@ HashSet of positives—O(n) space.
 | | |
 |--|--|
 | Time | O(n) |
-| Space | O(1) |
+| Space | O(n) — boolean array; O(1) with in-place negation |
 
 ---
 
 ## Similar Problems
 
-- [duplicate-integer](../duplicate-integer/README.md)
-- [find-duplicate-integer](../find-duplicate-integer/README.md)
+- [find-duplicate-integer](../find-duplicate-integer/README.md) — similar index-as-value mapping
+- [contains-duplicate-ii](../contains-duplicate-ii/README.md) — presence detection
 
 ---
 
 ## One-line Takeaway
 
-**First missing positive → mark presence in [1,n] using array indices.**
+**Answer in [1, n+1]; mark bool[num-1] for valid nums; first false slot is answer.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Filter to 1..n
-- [ ] Scan marks
+- [ ] Why is the answer guaranteed in `[1, n+1]`?
+- [ ] Filter condition for which values to mark?
+- [ ] What to return if all 1..n are present?
+- [ ] Describe O(1) space in-place approach.
 
 ---
 
@@ -116,4 +136,4 @@ HashSet of positives—O(n) space.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-3 |
+| — | `submission-0` (HashSet) → `submission-2` (wasteful bool) → `submission-3` (tight bool, best) |

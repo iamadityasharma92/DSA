@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Binary Search |
 | Difficulty | Hard |
-| Primary Pattern | Binary Search Partition |
-| Secondary Pattern | Two Pointers |
+| Primary Pattern | Binary Search — partition on smaller array |
+| Secondary Pattern | Virtual boundary values |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,46 @@
 
 ## Problem Summary
 
-Interview problem `median-of-two-sorted-arrays`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given two sorted arrays `nums1` and `nums2`, return the **median** of the combined sorted array. Must be O(log(m+n)).
+
+---
+
+## Constraints (typical)
+
+- `0 ≤ m, n ≤ 1000`, `m + n ≥ 1`
+- Arrays are sorted ascending
+- Must be O(log(min(m, n)))
+
+---
+
+## Brute Force
+
+Merge both arrays, find median → O(m + n). Exceeds O(log) constraint.
 
 ---
 
 ## Core Observation
 
-Correct partition splits combined sorted halves of equal total left count.
+Binary search a **partition of the smaller array** such that the left halves of both arrays together contain exactly `(m+n+1)/2` elements, and `max(left) ≤ min(right)` globally. The median is then determined by the boundary elements.
 
 ---
 
 ## Thinking Process
 
-1. Ensure nums1 is shorter
-2. BS mid1 on nums1, mid2 derived
-3. Check l1≤r2 and l2≤r1
-4. Even: avg max left min right; odd max left
-
-**Best understanding:** BS partition on smaller array; left halves ≤ right halves; median from boundary vals
+1. Ensure `nums1` is the smaller array (swap if needed).
+2. BS on `mid1 ∈ [0, n1]` (partition of nums1). `mid2 = (n1+n2+1)/2 - mid1` (partition of nums2).
+3. Compute `l1, l2, r1, r2` — boundary values (use `INT_MIN`/`INT_MAX` at edges).
+4. If `l1 <= r2 && l2 <= r1` → valid partition:
+   - Even total: `(max(l1,l2) + min(r1,r2)) / 2.0`
+   - Odd total: `max(l1, l2)`
+5. Else if `l1 > r2` → move partition left: `r = mid1 - 1`
+6. Else → move right: `l = mid1 + 1`
 
 ---
 
 ## Why the Approach Works
 
-Partition invariant equals merged order without full merge.
+A valid partition divides all `m+n` elements into two equal-sized groups where every element on the left is ≤ every element on the right. Binary search on `mid1` finds this partition in O(log(n1)) steps.
 
 ---
 
@@ -44,42 +60,46 @@ Partition invariant equals merged order without full merge.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Binary Search Partition |
-| Secondary | Two Pointers |
+| Primary | BS on partition index (not value) |
+| Virtual | INT_MIN/INT_MAX as sentinels for out-of-bounds partitions |
 
 ### Pattern Recognition Clues
 
-- Two sorted arrays median
-- O(log min(m,n))
+- "Median of two sorted arrays, O(log) required"
+- Partition two arrays jointly
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Binary Search](../Binary%20Search/README.md) · [PATTERNS.md](../../PATTERNS.md#binary-search-templates)
 
 ---
 
 ## Alternative Approaches
 
-Merge arrays O(m+n)—too slow.
+Merge + find middle — O(m+n), not O(log). Only use if O(log) not required.
 
 ---
 
 ## Critical Implementation Details
 
-- Use MIN/MAX sentinels for empty halves
-- mid2 = (m+n+1)/2 - mid1
+- BS on the **smaller array** to keep `mid2 ≥ 0` always
+- `mid2 = (n1+n2+1)/2 - mid1` — the `+1` handles odd totals (left side gets the extra element)
+- Boundary `l1 = mid1 == 0 ? INT_MIN : nums1[mid1-1]` — handles empty left partition
+- Even total: average of boundary maxs+mins. Odd total: `max(l1, l2)` directly
 
 ---
 
 ## Edge Cases
 
-- One array empty
-- Odd/even total length
+- One empty array → median of the other
+- Arrays of length 1 each
+- Even vs odd combined lengths
 
 ---
 
 ## Common Mistakes
 
-- BS on wrong array size
-- Wrong even median formula
+- Not ensuring smaller array is binary-searched (mid2 can become negative)
+- Using `(n1+n2)/2` without `+1` (wrong for odd totals — left side should be larger)
+- Incorrect virtual boundaries at empty partitions
 
 ---
 
@@ -87,28 +107,30 @@ Merge arrays O(m+n)—too slow.
 
 | | |
 |--|--|
-| Time | O(log min(m,n)) |
+| Time | O(log(min(m, n))) |
 | Space | O(1) |
 
 ---
 
 ## Similar Problems
 
-- [find-k-closest-elements](../find-k-closest-elements/README.md)
-- [merge-two-sorted-linked-lists](../merge-two-sorted-linked-lists/README.md)
+- [find-k-closest-elements](../find-k-closest-elements/README.md) — binary search on partition
+- [binary-search](../binary-search/README.md) — simpler BS foundation
 
 ---
 
 ## One-line Takeaway
 
-**Two-array median → partition BS on smaller array.**
+**BS on smaller array's partition index; valid when max(left halves) ≤ min(right halves).**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Partition balance
-- [ ] Boundary max/min
+- [ ] Which array does binary search run on, and why?
+- [ ] Formula for `mid2`? Why `(n1+n2+1)/2`?
+- [ ] Sentinel values for boundary elements at edges?
+- [ ] Even vs odd combined length: how does median formula differ?
 
 ---
 
@@ -116,4 +138,4 @@ Merge arrays O(m+n)—too slow.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-5 |
+| — | Documented from `submission-5.java` |

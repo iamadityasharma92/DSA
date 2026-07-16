@@ -1,11 +1,11 @@
-# Longest Repeating Substring with Replacement
+# Longest Repeating Character Replacement
 
 | Field | Value |
 |-------|-------|
 | Topic | Sliding Window |
 | Difficulty | Medium |
-| Primary Pattern | Sliding Window |
-| Secondary Pattern | Hashing |
+| Primary Pattern | Sliding Window + max-frequency tracking |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,46 @@
 
 ## Problem Summary
 
-Interview problem `longest-repeating-substring-with-replacement`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given a string `s` and integer `k`, you can replace at most `k` characters. Find the length of the longest substring containing the same letter after at most `k` replacements.
+
+---
+
+## Constraints (typical)
+
+- `1 ≤ s.length ≤ 10⁵`, `0 ≤ k ≤ s.length`
+- Uppercase letters only
+
+---
+
+## Brute Force
+
+`submission-0`: nested loops expanding every window and tracking `maxFreq` — O(n²). TLE.
 
 ---
 
 ## Core Observation
 
-Window valid if non-dominant chars ≤ k replacements.
+A window is valid iff `windowLen - maxFreq <= k` (the number of non-dominant characters ≤ replacements allowed). To maximize window length, track the maximum frequency character lazily.
+
+**Key trick (`submission-2`):** never shrink `maxf` when shrinking the window — if `maxf` doesn't decrease, the window can only grow or stay the same, so we never record a worse answer.
 
 ---
 
 ## Thinking Process
 
-1. Freq array + maxFreq in window
-2. Expand r, update maxFreq
-3. While (r-l+1)-maxFreq > k shrink l
-4. ans = max window size
+1. `l = r = 0`, `maxf = 0`, `hash[26]`, `ans = 0`.
+2. Expand: `hash[s[r]-'A']++`; update `maxf = max(maxf, hash[s[r]-'A'])`.
+3. If `(r-l+1) - maxf > k`: shrink — `hash[s[l]-'A']--`; `l++`. (Do NOT recompute `maxf`.)
+4. `ans = max(ans, r-l+1)`.
+5. `r++`.
 
-**Best understanding:** Expand r; while windowLen - maxFreq > k shrink l; track max window
+`submission-1` recomputes `maxf` on shrink (correct but slower). `submission-2` skips the recompute (key optimization).
 
 ---
 
 ## Why the Approach Works
 
-maxFreq char needs no replacements; others fill k budget.
+The invariant `windowLen - maxf <= k` tracks valid windows. By not shrinking `maxf`, we guarantee the answer never decreases — the window monotonically grows or shifts. The lazy `maxf` is a safe upper bound that doesn't break correctness.
 
 ---
 
@@ -44,42 +60,46 @@ maxFreq char needs no replacements; others fill k budget.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Sliding Window |
-| Secondary | Hashing |
+| Primary | Variable sliding window with dominant char frequency |
+| Key invariant | `windowLen - maxFreq <= k` |
+| Contrast | Fixed-size windows (permutation-string) vs variable (this) |
 
 ### Pattern Recognition Clues
 
-- At most k changes
-- Longest substring
+- "Longest substring with at most k replacements"
+- Windows can shrink and grow; track character dominance
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Sliding Window](../Sliding%20Window/README.md) · [PATTERNS.md](../../PATTERNS.md#sliding-window-variable--fixed)
 
 ---
 
 ## Alternative Approaches
 
-Recompute maxFreq each shrink—slower but safe.
+`submission-1` recomputes `maxf` on shrink — correct, O(26n). `submission-2` skips recompute — O(n). Both pass.
 
 ---
 
 ## Critical Implementation Details
 
-- Validity: length - maxFreq ≤ k
-- maxFreq only increases—lazy shrink ok
+- Do NOT recompute `maxf` on shrink (key optimization of `submission-2`)
+- `(r-l+1) - maxf` is changes needed; valid when `<= k`
+- `maxf` is a running max — it can only grow, never decrease in the optimal approach
 
 ---
 
 ## Edge Cases
 
-- k=0 reduces to all same char
-- k >= length always full string
+- `k >= s.length()` → entire string (all replacements)
+- All same character → entire string (no replacements)
+- `k = 0` → longest run of a single character
 
 ---
 
 ## Common Mistakes
 
-- Recomputing maxFreq every shrink unnecessarily
-- Wrong validity formula
+- Recomputing `maxf` on shrink (wastes O(26) per shrink step)
+- Using `>` instead of strict `>` in the shrink condition
+- Confusing `windowLen - maxf` with `maxf - windowLen`
 
 ---
 
@@ -87,28 +107,29 @@ Recompute maxFreq each shrink—slower but safe.
 
 | | |
 |--|--|
-| Time | O(n) |
-| Space | O(1) alphabet |
+| Time | O(n) with lazy maxf; O(26n) with recompute |
+| Space | O(1) — 26-char array |
 
 ---
 
 ## Similar Problems
 
-- [longest-substring-without-duplicates](../longest-substring-without-duplicates/README.md)
-- [minimum-window-with-characters](../minimum-window-with-characters/README.md)
+- [longest-substring-without-duplicates](../longest-substring-without-duplicates/README.md) — variable window, different validity condition
+- [permutation-string](../permutation-string/README.md) — fixed-size window, anagram check
 
 ---
 
 ## One-line Takeaway
 
-**K replacements window → len - maxFreq ≤ k.**
+**windowLen - maxFreq > k → shrink; never recompute maxFreq on shrink.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] maxFreq tracking
-- [ ] Shrink when invalid
+- [ ] What is the window validity condition?
+- [ ] Why is it safe to not recompute `maxf` after shrinking?
+- [ ] Contrast with recomputing variant?
 
 ---
 
@@ -116,4 +137,4 @@ Recompute maxFreq each shrink—slower but safe.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | `submission-0` (brute O(n²)) → `submission-1` (recompute maxf) → `submission-2` (lazy maxf, optimal) |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Binary Search |
 | Difficulty | Easy |
-| Primary Pattern | Binary Search |
-| Secondary Pattern | Array |
+| Primary Pattern | Binary Search — leftmost insert position |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `search-insert-position`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Given a sorted array and a target, return the index if target is found. If not, return the index where it would be inserted in order.
+
+---
+
+## Constraints (typical)
+
+- Sorted, no duplicates
+- O(log n) required
+
+---
+
+## Brute Force
+
+Linear scan → O(n). Returns first index where `nums[i] >= target`.
 
 ---
 
 ## Core Observation
 
-Lower bound binary search: lo ends at first index ≥ target.
+This is the **lower bound** binary search: find the leftmost position where `nums[pos] >= target`. Standard binary search with half-open right boundary and `r = m` on overshoot.
 
 ---
 
 ## Thinking Process
 
-1. l=0,r=n-1
-2. Standard BS on sorted nums
-3. If found return mid
-4. Else return l
-
-**Best understanding:** BS for target; return lo when not found—insert position
+1. `l = 0`, `r = nums.length` (half-open — `r` can be past the end for insert-at-end).
+2. While `l < r`: `m = l + (r-l)/2`.
+3. If `nums[m] == target` → return `m`.
+4. If `nums[m] > target` → `r = m` (target would go before or at `m`).
+5. Else → `l = m + 1`.
+6. Return `l` (insert position if not found).
 
 ---
 
 ## Why the Approach Works
 
-Invariant: answer is leftmost feasible insert index.
+When `l == r`, the loop exits. `l` is the first position where all elements to the left are strictly less than `target` — the correct insert position.
 
 ---
 
@@ -44,42 +57,44 @@ Invariant: answer is leftmost feasible insert index.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Binary Search |
-| Secondary | Array |
+| Primary | Lower bound / leftmost position binary search |
+| Template | Half-open `[l, r)` with `r = n`; return `l` |
 
 ### Pattern Recognition Clues
 
-- Sorted array insert index
-- Classic BS template
+- "Return index if found, else insert position"
+- Always returns a valid index even if target absent
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Binary Search](../Binary%20Search/README.md) · [PATTERNS.md](../../PATTERNS.md#binary-search-templates)
 
 ---
 
 ## Alternative Approaches
 
-Linear scan.
+Linear scan O(n) — too slow. Java's `Arrays.binarySearch` returns negative insertion point if not found — usable but non-portable interview answer.
 
 ---
 
 ## Critical Implementation Details
 
-- Return l not r after loop
-- Avoid overflow mid
+- `r = nums.length` (not `nums.length - 1`) — target may need to be inserted after the last element
+- Return `l`, not `r` (they're equal at exit, but `l` is conventional)
+- `while(l < r)` not `l <= r` to avoid processing the out-of-bounds `r = nums.length` index
 
 ---
 
 ## Edge Cases
 
-- Target greater than all → n
-- Target less than all → 0
+- Target smaller than all elements → return 0
+- Target larger than all elements → return `n`
+- Target equal to a middle element → found and returned immediately
 
 ---
 
 ## Common Mistakes
 
-- Returning r
-- Wrong loop condition
+- `r = nums.length - 1` (misses insert-at-end case)
+- `while(l <= r)` with `r = n` (accesses `nums[n]` — out of bounds)
 
 ---
 
@@ -94,21 +109,22 @@ Linear scan.
 
 ## Similar Problems
 
-- [binary-search](../binary-search/README.md)
-- [find-peak-element](../find-peak-element/README.md)
+- [binary-search](../binary-search/README.md) — exact match only
+- [eating-bananas](../eating-bananas/README.md) — BS on value space
 
 ---
 
 ## One-line Takeaway
 
-**Search insert → BS return lo as lower bound.**
+**Lower-bound BS: `r = n`; `r = m` on overshoot; `l = m+1` on undershoot; return `l`.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] return lo
-- [ ] sorted invariant
+- [ ] Why `r = nums.length` not `nums.length - 1`?
+- [ ] `while(l < r)` not `l <= r`?
+- [ ] Return `l` at the end?
 
 ---
 
@@ -116,4 +132,4 @@ Linear scan.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-0 |
+| — | Documented from `submission-0.java` |

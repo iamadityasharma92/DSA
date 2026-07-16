@@ -4,8 +4,8 @@
 |-------|-------|
 | Topic | Two Pointers |
 | Difficulty | Easy |
-| Primary Pattern | Two Pointers |
-| Secondary Pattern | Array |
+| Primary Pattern | Two Pointers (fill from the back) |
+| Secondary Pattern | — |
 | Confidence | — |
 | Last Revision | Never |
 
@@ -13,30 +13,43 @@
 
 ## Problem Summary
 
-Interview problem `merge-sorted-array`. Documented from accepted Java submissions in this folder (best understanding across attempts).
+Merge `nums2` into `nums1` (which has extra space at the end). `nums1` has `m` valid elements, `nums2` has `n`. Merge in-place so `nums1` is sorted.
+
+---
+
+## Constraints (typical)
+
+- `nums1.length = m + n` (pre-allocated)
+- Both arrays sorted ascending
+- Merge in-place (O(1) extra space)
+
+---
+
+## Brute Force
+
+Copy `nums2` into the trailing zeros of `nums1`, then sort — O((m+n) log(m+n)). Wastes the sorted property.
 
 ---
 
 ## Core Observation
 
-Backward merge avoids overwriting unprocessed nums1 elements.
+Fill from the **back**. Start pointers at the last valid elements of each array (`m-1`, `n-1`) and at the last position in `nums1` (`m+n-1`). The larger value goes to `last--`. Continue until `nums2` is exhausted.
 
 ---
 
 ## Thinking Process
 
-1. i=m-1,j=n-1,k=m+n-1
-2. Place larger at k, decrement pointers
-3. Drain nums2 remainder
-4. nums1 already in place if i remains
-
-**Best understanding:** Fill from end: compare nums1[i] vs nums2[j] place larger at write k
+1. `last = m+n-1; m--; n--`.
+2. While `n >= 0`:
+   - If `m >= 0 && nums1[m] > nums2[n]` → `nums1[last--] = nums1[m--]`
+   - Else → `nums1[last--] = nums2[n--]`
+3. When `n < 0`, all of `nums2` is merged (remaining `nums1` is already in place).
 
 ---
 
 ## Why the Approach Works
 
-Tail fill preserves untouched prefix of nums1 during merge.
+Writing from the back avoids overwriting unprocessed elements in `nums1`. Elements already in `nums1[0..m-1]` are only written further right, preserving unprocessed ones. The guard `m >= 0` handles exhausted `nums1`.
 
 ---
 
@@ -44,42 +57,46 @@ Tail fill preserves untouched prefix of nums1 during merge.
 
 | Role | Pattern |
 |------|---------|
-| Primary | Two Pointers |
-| Secondary | Array |
+| Primary | Back-fill: write largest first from the end |
+| Contrast | Front-merge requires extra space |
 
 ### Pattern Recognition Clues
 
-- In-place merge into nums1 with extra space at end
-- Both sorted
+- "Merge in-place into first array with extra trailing space"
+- Think backwards: fill the destination from the end
 
-Cross-ref: topic hub · [PATTERNS.md](../../PATTERNS.md)
+Cross-ref: [Two Pointers](../Two%20Pointers/README.md)
 
 ---
 
 ## Alternative Approaches
 
-Forward merge with extra buffer—needs O(m) space.
+Copy `nums2` to end of `nums1`, sort — O((m+n) log(m+n)). Simple but ignores sorted property.
 
 ---
 
 ## Critical Implementation Details
 
-- Write from back
-- Handle nums2 leftovers
+- Pre-decrement both pointers (`m--; n--`) before the loop — indices are 0-based last valid element
+- Guard `m >= 0` inside the loop (nums1 may be exhausted first)
+- Stop when `n < 0` — remaining nums1 is already correct (already in place)
+- No need to drain `m` — nums1 elements stay where they are
 
 ---
 
 ## Edge Cases
 
-- nums2 empty
-- All nums2 larger
+- `m = 0` → just copy nums2
+- `n = 0` → nothing to do
+- `nums2` entirely larger → nums2 fills the front
 
 ---
 
 ## Common Mistakes
 
-- Forward merge overwrite
-- Forgetting nums2 tail
+- Draining remaining `m` after loop (unnecessary — nums1 already in place)
+- Not guarding `m >= 0` in the while body (ArrayIndexOutOfBoundsException)
+- Going forward instead of backward (needs O(n) extra space)
 
 ---
 
@@ -87,28 +104,29 @@ Forward merge with extra buffer—needs O(m) space.
 
 | | |
 |--|--|
-| Time | O(m+n) |
+| Time | O(m + n) |
 | Space | O(1) |
 
 ---
 
 ## Similar Problems
 
-- [merge-two-sorted-linked-lists](../merge-two-sorted-linked-lists/README.md)
-- [merge-strings-alternately](../merge-strings-alternately/README.md)
+- [merge-strings-alternately](../merge-strings-alternately/README.md) — two-source merge with different ordering
+- [merge-two-sorted-linked-lists](../merge-two-sorted-linked-lists/README.md) — same sorted merge, linked lists
 
 ---
 
 ## One-line Takeaway
 
-**Merge into nums1 → backward two pointers from end.**
+**Fill nums1 from the back: larger of tail elements goes last; stop when nums2 exhausted.**
 
 ---
 
 ## Revision Checklist
 
-- [ ] Fill from rear
-- [ ] Drain nums2
+- [ ] Why fill from the back?
+- [ ] Guard on `m >= 0` in the loop?
+- [ ] Why don't we need to drain remaining `nums1` elements?
 
 ---
 
@@ -116,4 +134,4 @@ Forward merge with extra buffer—needs O(m) space.
 
 | Date | Note |
 |------|------|
-| — | Initial documentation from submission-2 |
+| — | Documented from `submission-2.java` |
