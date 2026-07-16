@@ -1,0 +1,31 @@
+---
+description: NeetCode DSA solutions repo layout, purpose, and agent defaults
+alwaysApply: true
+---
+
+# Repo overview
+
+Personal **NeetCode / LeetCode-style** solutions by `@iamadityasharma92`.
+
+## Layout
+
+- Workspace root: `GIT-DSA/` (Cursor workspace; not a git root).
+- Git repo: `DSA/` → `https://github.com/iamadityasharma92/DSA.git`
+- Solutions live only under:
+
+```
+DSA/Data Structures & Algorithms/<problem-slug>/submission-N.java
+```
+
+- ~90+ problem folders; language is **Java only**.
+- Problem slugs are NeetCode kebab-case (e.g. `two-integer-sum`, `permutation-string`).
+- Multiple `submission-N.java` files = iterative attempts (higher N is usually later/better).
+
+## Agent defaults
+
+- Help with understanding, debugging, optimizing, or writing the next submission.
+- Prefer adding `submission-(max+1).java` over overwriting older attempts unless asked.
+- Match existing compact style; do not add packages, build systems, or project scaffolding.
+- Explain time/space complexity when proposing a solution.
+- Git root for commits is `DSA/`, not the workspace root. Only commit when explicitly asked.
+- Commit message style: `Add: <problem-slug> - submission-N` or `Update: <problem-slug> - submission-N`.

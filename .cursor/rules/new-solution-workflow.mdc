@@ -1,0 +1,178 @@
+---
+description: Workflow for documenting a newly added DSA solution. Triggered when the user adds a new submission file or asks to document a specific problem.
+alwaysApply: false
+---
+
+# New Solution Documentation Workflow
+
+Follow this exact sequence every time a new or updated solution is added.
+
+---
+
+## Step 0 — Identify the problem
+
+- Determine the problem slug (kebab-case folder name under `DSA/Data Structures & Algorithms/`).
+- If the submission file already exists, read it. If it does not exist yet, ask the user for the solution code before proceeding.
+- Determine `N` = highest existing `submission-N.java` number. New submissions go to `submission-(N+1).java`.
+
+---
+
+## Step 1 — Read ALL submissions
+
+- Read every `submission-*.java` in the problem folder before writing a single word of documentation.
+- Identify the **evolution**: what changed between attempts (brute → optimized, wrong approach → correct, cleaner code).
+- The final (highest-numbered) accepted submission defines the canonical approach for documentation.
+
+---
+
+## Step 2 — Write or update the Problem README
+
+File: `DSA/Data Structures & Algorithms/<problem-slug>/README.md`
+
+If the README does not exist, create it from scratch using this structure.
+If it exists, update only the sections that changed.
+
+### Required sections (never omit any):
+
+```
+# <Problem Title>
+
+| Field | Value |
+|-------|-------|
+| Topic | <topic> |
+| Difficulty | Easy / Medium / Hard |
+| Primary Pattern | <pattern name> |
+| Secondary Pattern | <pattern or —> |
+| Confidence | — (user updates after first revision) |
+| Last Revision | Never |
+
+---
+
+## Problem Summary
+## Constraints (typical)
+## Brute Force
+## Core Observation
+## Thinking Process
+## Why the Approach Works
+## Pattern Recognition
+## Alternative Approaches
+## Critical Implementation Details
+## Edge Cases
+## Common Mistakes
+## Complexity
+## Similar Problems
+## One-line Takeaway
+## Revision Checklist
+## Revision History
+```
+
+### Quality bar for each section:
+
+- **Problem Summary**: 1-2 lines. State the problem in your own words.
+- **Constraints**: List at least 2-3 bounds AND state what property each constraint enables (e.g. "all positive → sliding window valid").
+- **Brute Force**: Name the brute approach, its complexity, and exactly why it fails.
+- **Core Observation**: The single key insight that makes the optimal solution work. If you can't state it in 1-3 sentences, dig deeper.
+- **Thinking Process**: Numbered steps. How you would reconstruct the solution in an interview from scratch.
+- **Why the Approach Works**: Brief proof/reasoning. Not just "because it works."
+- **Pattern Recognition**: Table with Primary, Secondary, Alternative. Plus 2-3 recognition clues as bullets.
+- **Alternative Approaches**: Name, brief explanation, complexity. At least one.
+- **Critical Implementation Details**: 3-5 bullets. Things that cause bugs if forgotten.
+- **Edge Cases**: 3-5 bullets. Specific inputs with expected behavior.
+- **Common Mistakes**: 3-5 bullets. Specific wrong code or reasoning — not generic advice.
+- **Complexity**: Table with Time and Space.
+- **Similar Problems**: Cross-links to related problems in the repo (use relative paths).
+- **One-line Takeaway**: A memorable sentence — pattern + key detail. No vague generics.
+- **Revision Checklist**: 3-5 recall-trigger questions (not comprehension questions). Future-you should be able to reconstruct from these.
+- **Revision History**: Add a row: `| <date> | <brief note about what was learned or changed> |`
+
+---
+
+## Step 3 — Update the Topic README
+
+File: `DSA/Data Structures & Algorithms/<Topic Name>/README.md`
+
+- Add or update the entry for this problem in the "Problems Covered" table.
+- If a new pattern was identified, add it to "Frequently Used Patterns".
+- If the problem demonstrates a decision worth adding to the "Decision Tree", add it.
+- Do NOT rewrite the entire file — only update the affected sections.
+
+---
+
+## Step 4 — Update PATTERNS.md
+
+File: `DSA/PATTERNS.md`
+
+- Identify the primary pattern of this problem.
+- If the pattern **does not exist** in PATTERNS.md: add a full new entry:
+
+```
+# <Pattern Name>
+
+## When to Think About It
+## Core Idea
+## Recognition Clues
+## Common Variations
+## Complexity
+## Common Mistakes
+## Related Problems
+## Key Takeaways
+```
+
+- If the pattern **already exists**: append new insights under the relevant sub-sections only. Never duplicate.
+- Cross-link the new problem under "Related Problems" of its pattern.
+
+---
+
+## Step 5 — Update REVISION.md
+
+File: `DSA/REVISION.md`
+
+- Add a new row to the main tracking table:
+
+```
+| <problem-slug> | <Topic> | <Difficulty> | — | <today's date> | 3 days from now | 1 |
+```
+
+- Move the problem to the "Recently Revised" section.
+- Remove it from "Never Revised" if it was listed there.
+
+---
+
+## Step 6 — Update root README.md
+
+File: `DSA/README.md`
+
+Update these sections (only):
+
+- **Progress**: increment Total Problems, and Easy/Medium/Hard count.
+- **Topic Progress**: increment the solved count for the relevant topic.
+- **Pattern Coverage**: increment the count for the primary pattern.
+- **Recently Added Problems**: add this problem (keep only the last 5-10).
+- **Revision Dashboard**: move from "Never Revised" to "Recently Revised" if applicable.
+
+---
+
+## Constraints on Every Update
+
+- Never copy editorial text.
+- Never duplicate content already in another file — cross-reference instead.
+- Never rewrite sections that are already correct.
+- Never add code blocks to README files (the submissions are the code).
+- Confidence field is always left as `—` for newly documented problems (user fills this in after first real revision).
+- Revision History gets one new row per documentation session.
+
+---
+
+## Commit (only when user asks)
+
+```
+Add: <problem-slug> - submission-N
+```
+
+or if updating an existing solution:
+
+```
+Update: <problem-slug> - submission-N
+```
+
+Git root: `DSA/` (not workspace root).

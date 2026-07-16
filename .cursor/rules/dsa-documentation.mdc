@@ -1,0 +1,373 @@
+---
+description: Maintain and document the DSA repository as an interview preparation knowledge base.
+alwaysApply: true
+---
+
+# Objective
+
+Treat this repository as a long-term interview preparation knowledge base.
+
+The repository is NOT merely a collection of accepted solutions.
+
+Its purpose is to help Future Me quickly revise concepts, identify patterns, and reconstruct solutions independently after months.
+
+Every documentation update should optimize for:
+
+- Fast recall
+- Pattern recognition
+- Interview preparation
+- Long-term revision
+
+Never optimize for teaching from scratch.
+
+---
+
+# Repository Structure
+
+DSA/
+
+├── README.md
+├── PATTERNS.md
+├── REVISION.md
+└── Data Structures & Algorithms/
+    ├── <Topic Folder>/
+    │   ├── README.md
+    │   └── ...
+    └── <Problem Folder>/
+        ├── README.md
+        ├── submission-0.java
+        ├── submission-1.java
+        └── ...
+
+---
+
+# General Principles
+
+Always read every available Java submission before documenting.
+
+Infer the final understanding from all accepted solutions.
+
+Never duplicate Java code.
+
+Never copy editorials.
+
+Never explain code line-by-line.
+
+Prefer:
+
+- reasoning
+- patterns
+- decision making
+
+over implementation.
+
+---
+
+# Documentation Levels
+
+Maintain documentation at four levels.
+
+## Level 1
+
+Problem README
+
+Purpose
+
+Revise one specific interview problem.
+
+Contains
+
+- Problem Summary
+- Constraints
+- Brute Force
+- Core Observation
+- Thinking Process
+- Why the approach works
+- Pattern Recognition
+- Pattern Recognition Clues
+- Alternative Approaches
+- Critical Implementation Details
+- Edge Cases
+- Common Mistakes
+- Complexity
+- Similar Problems
+- One-line Takeaway
+- Revision Checklist
+- Revision History
+
+Never include full code.
+
+---
+
+## Level 2
+
+Topic README
+
+Purpose
+
+Revise an entire topic.
+
+Maintain
+
+- Topic Overview
+- Core Concepts
+- Frequently Used Patterns
+- Decision Tree
+- Common Tricks
+- Common Mistakes
+- Complexity Cheat Sheet
+- Problems Covered
+- Topic Takeaways
+
+Do not repeat individual problem explanations.
+
+---
+
+## Level 3
+
+PATTERNS.md
+
+Purpose
+
+Create a reusable pattern encyclopedia.
+
+For every pattern maintain
+
+# Pattern Name
+
+## When to Think About It
+
+## Core Idea
+
+## Recognition Clues
+
+## Common Variations
+
+## Complexity
+
+## Common Mistakes
+
+## Related Problems
+
+## Key Takeaways
+
+If the pattern already exists,
+
+append new insights instead of duplicating.
+
+---
+
+## Level 4
+
+REVISION.md
+
+Purpose
+
+Track revision only.
+
+Maintain
+
+| Problem | Topic | Difficulty | Confidence | Last Revision | Next Revision | Revision Count |
+
+Never explain solutions here.
+
+Also maintain
+
+Priority Revision
+
+Weak Topics
+
+Recently Revised
+
+Never Revised
+
+---
+
+# Root README
+
+Treat this as an Interview Dashboard.
+
+Maintain
+
+## Progress
+
+- Total Problems
+- Easy
+- Medium
+- Hard
+
+## Topic Progress
+
+| Topic | Solved | Total | Progress |
+
+## Pattern Coverage
+
+Track occurrences of
+
+- Sliding Window
+- Two Pointer
+- Binary Search
+- Prefix Sum
+- DFS
+- BFS
+- DP
+- Trie
+- Greedy
+- Heap
+- Monotonic Stack
+- Hashing
+- Graph
+- Tree
+- Backtracking
+- etc.
+
+## Weak Areas
+
+Infer from
+
+- low confidence
+- few revisions
+- repeated mistakes
+
+## Recently Added Problems
+
+## Revision Dashboard
+
+Problems needing revision
+
+Problems never revised
+
+Problems revised once
+
+Problems revised multiple times
+
+## Interview Readiness
+
+Strong
+
+Average
+
+Weak
+
+---
+
+# Reflection Philosophy
+
+Every problem should answer
+
+What was the brute force?
+
+Why did it fail?
+
+What observation unlocked the solution?
+
+Why was this algorithm chosen?
+
+What pattern should I remember?
+
+What implementation detail is easiest to forget?
+
+How can I recognize this pattern again?
+
+What mistake is most likely during interviews?
+
+---
+
+# Writing Style
+
+Use concise Markdown.
+
+Prefer
+
+- headings
+- bullet lists
+- tables
+- decision trees
+
+Avoid large paragraphs.
+
+Future Me should understand everything within 2–3 minutes.
+
+---
+
+# Similar Problems
+
+Recommend similar problems only if they reinforce the same pattern.
+
+---
+
+# Pattern Recognition
+
+Always identify
+
+Primary Pattern
+
+Secondary Pattern
+
+Possible Alternative Pattern
+
+---
+
+# Revision Philosophy
+
+Documentation should trigger recall,
+
+not replace thinking.
+
+Never reveal the solution immediately.
+
+Guide the reader toward reconstructing it.
+
+---
+
+# Updating Rules
+
+Whenever documenting a solved problem
+
+Update
+
+1. Problem README
+
+2. Topic README
+
+3. PATTERNS.md
+
+4. REVISION.md
+
+5. Root README
+
+Update only affected sections.
+
+Never overwrite unrelated content.
+
+Never duplicate information already available elsewhere.
+
+Cross-reference instead whenever appropriate.
+
+---
+
+# Quality Checklist
+
+Before finishing ensure
+
+✓ No duplicated explanations
+
+✓ No copied editorial
+
+✓ Pattern identified
+
+✓ Core observation documented
+
+✓ Similar problems listed
+
+✓ Revision checklist present
+
+✓ Dashboard updated
+
+✓ Pattern encyclopedia updated
+
+✓ Revision tracker updated
+
+✓ Markdown is GitHub friendly
+
+✓ Documentation optimized for interview revision

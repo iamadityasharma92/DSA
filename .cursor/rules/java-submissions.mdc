@@ -1,0 +1,33 @@
+---
+description: Java NeetCode/LeetCode submission file conventions
+globs: DSA/**/*.java
+alwaysApply: false
+---
+
+# Java submission conventions
+
+## File shape
+
+- One top-level `class Solution` with the platform method signature.
+- **No** `package` or `import` statements (judge provides types like `List`, `HashMap`, `Arrays`).
+- Keep helpers as private methods on `Solution` when needed.
+- Filename: `submission-N.java` inside the problem folder.
+
+## Style to match
+
+- Compact: dense whitespace, short locals (`n`, `l`, `r`, `c1`).
+- Prefer clear algorithms over clever one-liners.
+- Light comments only for non-obvious window/pointer invariants.
+- Return platform-expected sentinels (`null`, `-1`, empty structures) as existing solutions do.
+
+## When editing
+
+```java
+// ✅ GOOD — next attempt as a new file
+// DSA/.../permutation-string/submission-8.java
+
+// ❌ BAD — rewrite history of submission-0..7 unless the user asks
+```
+
+- Optimize for interview clarity: state approach (e.g. sliding window + freq maps), then complexity.
+- Do not introduce JUnit, Maven/Gradle, or IDE-only wrappers unless requested.
