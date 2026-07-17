@@ -1,13 +1,13 @@
 # Binary Tree Diameter
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Easy |
-| Primary Pattern | Tree DFS / Aggregate Up |
+| Field | Value                                    |
+|-------|------------------------------------------|
+| Topic | Trees                                    |
+| Difficulty | Easy                                     |
+| Primary Pattern | Tree DFS / Aggregate Up                  |
 | Secondary Pattern | Global max of `leftHeight + rightHeight` |
-| Confidence | — |
-| Last Revision | Never |
+| Confidence | HIGH                                     |
+| Last Revision | 17/7/2026                                |
 
 ---
 

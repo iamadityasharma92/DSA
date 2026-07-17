@@ -1,13 +1,13 @@
 # Binary Tree Inorder Traversal
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Easy |
-| Primary Pattern | DFS traversal |
+| Field | Value               |
+|-------|---------------------|
+| Topic | Trees               |
+| Difficulty | Easy                |
+| Primary Pattern | DFS traversal       |
 | Secondary Pattern | Left → Node → Right |
-| Confidence | — |
-| Last Revision | Never |
+| Confidence | High                |
+| Last Revision | 17/7/2026           |
 
 ---
 

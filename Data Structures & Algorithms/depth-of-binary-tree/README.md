@@ -1,13 +1,13 @@
 # Maximum Depth of Binary Tree
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Easy |
+| Field | Value                   |
+|-------|-------------------------|
+| Topic | Trees                   |
+| Difficulty | Easy                    |
 | Primary Pattern | DFS (post-order height) |
-| Secondary Pattern | BFS level count |
-| Confidence | — |
-| Last Revision | Never |
+| Secondary Pattern | BFS level count         |
+| Confidence | HIGH                    |
+| Last Revision | 17/7/2026               |
 
 ---
 

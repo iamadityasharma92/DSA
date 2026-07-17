@@ -1,13 +1,13 @@
 # Same Binary Tree
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Easy |
+| Field | Value                     |
+|-------|---------------------------|
+| Topic | Trees                     |
+| Difficulty | Easy                      |
 | Primary Pattern | DFS structural comparison |
-| Secondary Pattern | — |
-| Confidence | — |
-| Last Revision | Never |
+| Secondary Pattern | —                         |
+| Confidence | HIGH                      |
+| Last Revision | 17/7/2026                 |
 
 ---
 

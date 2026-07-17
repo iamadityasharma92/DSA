@@ -1,13 +1,13 @@
 # Binary Tree Preorder Traversal
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Easy |
-| Primary Pattern | DFS traversal |
+| Field | Value               |
+|-------|---------------------|
+| Topic | Trees               |
+| Difficulty | Easy                |
+| Primary Pattern | DFS traversal       |
 | Secondary Pattern | Node → Left → Right |
-| Confidence | — |
-| Last Revision | Never |
+| Confidence | HIGH                |
+| Last Revision | 17/7/2026           |
 
 ---
 

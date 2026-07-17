@@ -1,13 +1,13 @@
 # Balanced Binary Tree
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Easy |
-| Primary Pattern | Tree DFS (post-order) |
+| Field | Value                  |
+|-------|------------------------|
+| Topic | Trees                  |
+| Difficulty | Easy                   |
+| Primary Pattern | Tree DFS (post-order)  |
 | Secondary Pattern | Height + balance check |
-| Confidence | — |
-| Last Revision | Never |
+| Confidence | HIGH                   |
+| Last Revision | 17/7/2026              |
 
 ---
 
