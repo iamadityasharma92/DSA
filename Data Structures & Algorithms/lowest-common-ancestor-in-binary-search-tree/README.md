@@ -1,13 +1,13 @@
 # Lowest Common Ancestor of a BST
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Medium |
+| Field | Value                               |
+|-------|-------------------------------------|
+| Topic | Trees                               |
+| Difficulty | Medium                              |
 | Primary Pattern | BST descent using ordering property |
-| Secondary Pattern | — |
-| Confidence | — |
-| Last Revision | Never |
+| Secondary Pattern | —                                   |
+| Confidence | Medium                              |
+| Last Revision | 22/07/2026                          |
 
 ---
 
