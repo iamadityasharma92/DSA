@@ -1,13 +1,13 @@
 # Delete Node in a BST
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Medium |
-| Primary Pattern | BST recursive descent |
+| Field | Value                         |
+|-------|-------------------------------|
+| Topic | Trees                         |
+| Difficulty | Medium                        |
+| Primary Pattern | BST recursive descent         |
 | Secondary Pattern | Inorder successor replacement |
-| Confidence | — |
-| Last Revision | Never |
+| Confidence | LOW                           |
+| Last Revision | 22/07/2026                    |
 
 ---
 

@@ -1,13 +1,13 @@
 # Insert into a Binary Search Tree
 
-| Field | Value |
-|-------|-------|
-| Topic | Trees |
-| Difficulty | Medium |
+| Field | Value                 |
+|-------|-----------------------|
+| Topic | Trees                 |
+| Difficulty | Medium                |
 | Primary Pattern | BST recursive descent |
-| Secondary Pattern | — |
-| Confidence | — |
-| Last Revision | Never |
+| Secondary Pattern | —                     |
+| Confidence | Medium                |
+| Last Revision | 22/07/2026            |
 
 ---
 
