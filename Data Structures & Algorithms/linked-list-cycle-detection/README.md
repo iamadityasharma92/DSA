@@ -1,13 +1,13 @@
 # Linked List Cycle Detection
 
-| Field | Value |
-|-------|-------|
-| Topic | Linked List |
-| Difficulty | Easy |
+| Field | Value                               |
+|-------|-------------------------------------|
+| Topic | Linked List                         |
+| Difficulty | Easy                                |
 | Primary Pattern | Floyd's Cycle Detection (fast/slow) |
-| Secondary Pattern | — |
-| Confidence | — |
-| Last Revision | Never |
+| Secondary Pattern | —                                   |
+| Confidence | MEDIUM                              |
+| Last Revision | 22/06/2026                          |
 
 ---
 
