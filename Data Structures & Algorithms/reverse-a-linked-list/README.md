@@ -1,13 +1,13 @@
 # Reverse a Linked List
 
-| Field | Value |
-|-------|-------|
-| Topic | Linked List |
-| Difficulty | Easy |
+| Field | Value                      |
+|-------|----------------------------|
+| Topic | Linked List                |
+| Difficulty | Easy                       |
 | Primary Pattern | Iterative pointer reversal |
-| Secondary Pattern | — |
-| Confidence | — |
-| Last Revision | Never |
+| Secondary Pattern | —                          |
+| Confidence | HIGH                       |
+| Last Revision | 22/06/2026                 |
 
 ---
 

@@ -1,13 +1,13 @@
 # Kth Largest Element in a Stream
 
-| Field | Value |
-|-------|-------|
+| Field | Value                 |
+|-------|-----------------------|
 | Topic | Heap / Priority Queue |
-| Difficulty | Easy |
-| Primary Pattern | Min-heap of size k |
-| Secondary Pattern | — |
-| Confidence | — |
-| Last Revision | Never |
+| Difficulty | Easy                  |
+| Primary Pattern | Min-heap of size k    |
+| Secondary Pattern | —                     |
+| Confidence | MEDIUM                |
+| Last Revision | 23/07/2026            |
 
 ---
 
