@@ -1,21 +1,30 @@
 import java.util.Scanner;
 
-public class max_of_array {
+public class first_index {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
 //        int n = sc.nextInt();
-        int x=2;
-        int[] arr= new int[]{10,20,123,30,-40,50};
-        int maxi=maxOfArray(arr,0);
-        System.out.println(maxi);
+        int x=20;
+        int[] arr= new int[]{10,20,123,30,-40,30,50,20};
+        int idx=firstIndex(arr,0,x);
+        System.out.println(idx);
         sc.close();
     }
-    static int maxOfArray(int[] arr,int idx) {
-        if (arr.length == idx) return Integer.MIN_VALUE;
+    static int firstIndex(int[] arr,int idx,int x) {
+        if (arr.length == idx) return -1;
 
-        int maxi=maxOfArray(arr,idx+1);
-        return Math.max(maxi,arr[idx]);
+        if(arr[idx]==x){
+            return idx;
+        }else {
+            int foundIdx = firstIndex(arr, idx + 1, x);
+//        if(arr[idx]==x){
+//            if(foundIdx!=-1)
+//                foundIdx=Math.min(foundIdx,idx);
+//        }
+
+            return foundIdx;
+        }
     }
 }
 

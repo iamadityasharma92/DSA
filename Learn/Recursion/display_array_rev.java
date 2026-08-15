@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class display_array {
+public class display_array_rev {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
@@ -14,10 +14,8 @@ public class display_array {
     static void disp(int[] arr,int idx) {
         if (arr.length == idx) return ;
 
-        System.out.println(arr[idx]);
         disp(arr,idx+1);
-
-
+        System.out.println(arr[idx]);
     }
 }
 

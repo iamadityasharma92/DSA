@@ -3,26 +3,48 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class subsequences {
+public class get_stairs_path {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
 //        int n = sc.nextInt();
-        String str="abc";
-        List<String> res=gss(str);
+        List<String> res=gsp(3);
         System.out.println(res);
 //        sc.close();
     }
-    static List<String> gss(String str) {
-        if(str.isEmpty())
-            return new ArrayList<>(Arrays.asList(""));
-        char ch=str.charAt(0);
-        List<String> temp= gss(str.substring(1));
-        int n=temp.size();
-        for(int i=0;i<n;i++){
-            temp.add(ch+temp.get(i));
+    static List<String> gsp(int n) {
+//        optimised or clean code
+        if(n==0)return new ArrayList<>(Arrays.asList(""));
+        List<String> res=new ArrayList<>();
+        for(int i=1;i<=3;i++){
+            if(n-i>=0){
+                List<String> temp= gsp(n-i);
+                for(String s:temp){
+                    res.add(i+s);
+                }
+            }
         }
-        return temp;
+        return res;
+
+//        if(n==0){
+//            return new ArrayList<>(Arrays.asList(""));
+//        }else if(n<0) {
+//            return new ArrayList<>();
+//        }
+//        List<String> ps1=gsp(n-1);
+//        List<String> ps2=gsp(n-2);
+//        List<String> ps3=gsp(n-3);
+//        List<String> res= new ArrayList<>();
+//        for(String i:ps1){
+//            res.add(1+i);
+//        }
+//        for(String i:ps2){
+//            res.add(2+i);
+//        }
+//        for(String i:ps3){
+//            res.add(3+i);
+//        }
+//        return res;
     }
 }
 
