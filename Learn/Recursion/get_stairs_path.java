@@ -8,7 +8,7 @@ public class get_stairs_path {
         Scanner sc = new Scanner(System.in);
 
 //        int n = sc.nextInt();
-        List<String> res=gsp(3);
+        List<String> res=gsp(4);
         System.out.println(res);
 //        sc.close();
     }

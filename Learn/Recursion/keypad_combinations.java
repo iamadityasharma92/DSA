@@ -3,7 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
-public class keypad_comibinations {
+public class keypad_combinations {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
 
