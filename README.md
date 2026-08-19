@@ -1,4 +1,4 @@
-# NeetCode Solutions — @iamadityasharma92
+# DSA Solutions — @iamadityasharma92
 
 Interview preparation knowledge base. Solutions under `Data Structures & Algorithms/`; docs optimized for revision and pattern recall.
 
