@@ -17,7 +17,6 @@ public class print_stairs_path {
             System.out.print(psf+",");
             return ;
         }
-        List<String> res=new ArrayList<>();
         for(int i=1;i<=3;i++){
             if(n-i>=0){
                 gsp(n-i,i+psf);

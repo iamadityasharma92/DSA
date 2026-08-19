@@ -8,7 +8,7 @@ public class print_maze_path {
         Scanner sc = new Scanner(System.in);
 
 //        int n = sc.nextInt();
-        gmp(1,1,4,4,"");
+        gmp(1,1,3,3,"");
 //        sc.close();
     }
     static void gmp(int sc,int sr,int dc,int dr,String psf) {
@@ -17,10 +17,10 @@ public class print_maze_path {
             return;
         }
         if(sc<=dc){
-            gmp(sc+1,sr,dc,dr,"v"+psf);
+            gmp(sc+1,sr,dc,dr,psf+"v");
         }
         if(sr<=dr){
-            gmp(sc,sr+1,dc,dr,"h"+psf);
+            gmp(sc,sr+1,dc,dr,psf+"h");
         }
 
     }
